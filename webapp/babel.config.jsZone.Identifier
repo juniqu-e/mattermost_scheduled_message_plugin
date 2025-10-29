@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://github.com/mattermost/mattermost-plugin-starter-template/tree/master
+HostUrl=https://codeload.github.com/mattermost/mattermost-plugin-starter-template/zip/refs/heads/master
