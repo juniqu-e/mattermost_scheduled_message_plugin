@@ -1,5 +1,5 @@
 {
-  "id": "mattermost-plugin-schedule-message-gui",
+  "id": "com.mattermost-plugin-schedule-message-gui",
   "name": "Plugin Scheduled Messages GUI",
   "description": "Plugin to send scheduled messages with GUI",
   "homepage_url": "https://lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui",
