@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/internal/ports"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/constants"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/types"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 	"github.com/google/uuid"
 )
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 )
 
 type dateFormat int

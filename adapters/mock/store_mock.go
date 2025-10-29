@@ -7,8 +7,8 @@ package mock
 import (
 	reflect "reflect"
 
-	types "github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/types"
 	gomock "github.com/golang/mock/gomock"
+	types "lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
 
 // MockStore is a mock of Store interface.

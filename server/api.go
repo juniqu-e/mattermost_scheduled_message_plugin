@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/constants"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/types"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"

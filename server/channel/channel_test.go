@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/adapters/mock"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/internal/ports"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/internal/testutil"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/testutil"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"github.com/golang/mock/gomock"
 	"github.com/mattermost/mattermost/server/public/model"
 )

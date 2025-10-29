@@ -1,10 +1,10 @@
 package ports
 
 import (
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/clock"
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/types"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/clock"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
 
 type Logger interface {

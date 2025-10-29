@@ -1,4 +1,4 @@
-module github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages
+module lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui
 
 go 1.23.0
 

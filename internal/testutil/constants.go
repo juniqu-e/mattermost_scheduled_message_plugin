@@ -3,7 +3,7 @@ package testutil
 import (
 	"fmt"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 )
 
 func SchedKey(id string) string {

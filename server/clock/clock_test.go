@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/clock"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/clock"
 )
 
 func TestRealClock_Now(t *testing.T) {

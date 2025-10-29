@@ -7,8 +7,8 @@ package mock
 import (
 	reflect "reflect"
 
-	ports "github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/internal/ports"
 	gomock "github.com/golang/mock/gomock"
+	ports "lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 )
 
 // MockChannelService is a mock of ChannelService interface.

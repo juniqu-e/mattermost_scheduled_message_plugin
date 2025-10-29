@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/apartmentlines/mattermost-plugin-poor-mans-scheduled-messages/server/types"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 	"github.com/mattermost/mattermost/server/public/model"
 )
 
