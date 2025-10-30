@@ -39,6 +39,9 @@ const config = {
             'node_modules',
         ],
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+        alias: {
+            manifest: path.resolve(__dirname, '..', 'plugin.json'),
+        },
     },
     module: {
         rules: [
