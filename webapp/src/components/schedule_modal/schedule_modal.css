@@ -1,0 +1,108 @@
+/*
+ * Schedule Modal Styles
+ */
+
+/* 모달을 화면 정중앙에 배치 */
+.schedule-modal {
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0 auto;
+}
+
+.schedule-modal .modal-content {
+    width: 100%;
+}
+
+/* ---- Date Time Picker ---- */
+.date-time-picker {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 4px 0;
+}
+
+.date-time-picker__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.date-time-picker__label {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 16px;
+    color: var(--center-channel-color);
+    margin: 0 0 2px 0;
+}
+
+/* ---- Form Controls ---- */
+.schedule-modal .form-control {
+    width: 100%;
+    height: 40px;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--center-channel-color);
+    background-color: var(--center-channel-bg);
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.schedule-modal .form-control:hover {
+    border-color: rgba(var(--center-channel-color-rgb), 0.32);
+}
+
+.schedule-modal .form-control:focus {
+    outline: none;
+    border-color: var(--button-bg);
+    box-shadow: 0 0 0 2px rgba(var(--button-bg-rgb), 0.16);
+}
+
+.schedule-modal .form-control:disabled {
+    background-color: rgba(var(--center-channel-color-rgb), 0.04);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Date/Time input 특정 스타일 */
+.schedule-modal input[type='date'],
+.schedule-modal input[type='time'] {
+    color-scheme: light dark;
+}
+
+.schedule-modal input[type='date']::-webkit-calendar-picker-indicator,
+.schedule-modal input[type='time']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+}
+
+.schedule-modal input[type='date']::-webkit-calendar-picker-indicator:hover,
+.schedule-modal input[type='time']::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* ---- Modal Footer Buttons ---- */
+.schedule-modal .modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.schedule-modal .modal-footer .btn {
+    min-width: 80px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .schedule-modal {
+        max-width: 95%;
+        margin: 16px auto;
+    }
+}
