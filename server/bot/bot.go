@@ -13,7 +13,7 @@ func EnsureBot(botAPI ports.BotService, imgSvc ports.BotProfileImageService) (st
 	bot := &model.Bot{
 		Username:    "scheduled-messages",
 		DisplayName: "Message Scheduler",
-		Description: "Poor Man's Scheduled Messages Bot",
+		Description: "Scheduled Messages Bot",
 	}
 	profileImagePath := filepath.Join(constants.AssetsDir, constants.ProfileImageFilename)
 	profileImage := imgSvc.ProfileImagePath(profileImagePath)
