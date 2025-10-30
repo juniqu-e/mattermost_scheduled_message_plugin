@@ -14,6 +14,27 @@ import type {ProductScope} from '@mattermost/types/products';
 export type UniqueIdentifier = string;
 export type ReactResolvable = React.ReactNode | React.ElementType;
 
+// React Bootstrap types
+export interface TooltipProps {
+    id: string;
+    children?: React.ReactNode;
+}
+
+export interface OverlayTriggerProps {
+    placement?: 'top' | 'bottom' | 'left' | 'right';
+    overlay: React.ReactElement;
+    children: React.ReactElement;
+}
+
+declare global {
+    interface Window {
+        ReactBootstrap: {
+            OverlayTrigger: React.ComponentType<OverlayTriggerProps>;
+            Tooltip: React.ComponentType<TooltipProps>;
+        };
+    }
+}
+
 export type PluginComponent = {
     id: string;
     pluginId: string;
