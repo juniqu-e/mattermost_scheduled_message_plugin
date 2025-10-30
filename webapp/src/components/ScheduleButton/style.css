@@ -1,0 +1,53 @@
+/* Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+ * See LICENSE.txt for license information.
+ */
+
+.schedule-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    color: rgba(var(--center-channel-color-rgb), 0.64);
+    transition: all 0.2s;
+    position: relative;
+}
+
+.schedule-button:hover {
+    background: rgba(var(--center-channel-color-rgb), 0.08);
+    color: var(--button-bg);
+}
+
+.schedule-button:active {
+    background: rgba(var(--center-channel-color-rgb), 0.16);
+}
+
+.schedule-button i {
+    font-size: 18px;
+}
+
+/* 툴팁 효과 */
+.schedule-button::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+.schedule-button:hover::after {
+    opacity: 1;
+}

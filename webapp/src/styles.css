@@ -1,0 +1,53 @@
+/* Schedule Message Plugin Styles */
+
+/* Position the schedule message button in the post editor */
+.schedule-message-editor-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    margin: 0 4px;
+    background: transparent;
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.schedule-message-editor-button:hover {
+    background: rgba(var(--center-channel-color-rgb), 0.08);
+}
+
+.schedule-message-editor-button i {
+    font-size: 16px;
+    color: rgba(var(--center-channel-color-rgb), 0.64);
+}
+
+.schedule-message-editor-button:hover i {
+    color: rgba(var(--center-channel-color-rgb), 0.8);
+}
+
+/* Post action button */
+.schedule-message-post-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    margin: 0 4px;
+    background: transparent;
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.schedule-message-post-action:hover {
+    background: rgba(var(--center-channel-color-rgb), 0.08);
+}
+
+.schedule-message-post-action i {
+    font-size: 16px;
+    color: rgba(var(--center-channel-color-rgb), 0.64);
+}
+
+.schedule-message-post-action:hover i {
+    color: rgba(var(--center-channel-color-rgb), 0.8);
+}
