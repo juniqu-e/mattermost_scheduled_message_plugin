@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(command -v npm:*)"
+      "Bash(command -v npm:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
