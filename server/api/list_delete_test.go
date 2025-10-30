@@ -1,4 +1,4 @@
-package main
+package api_test
 
 import (
 	"bytes"
@@ -18,6 +18,8 @@ import (
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/testutil"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/api"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/command"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
@@ -25,17 +27,19 @@ import (
 var expectedAttachments = []*model.SlackAttachment{{Text: "dummy attachment data"}}
 
 type mockCommand struct {
-	UserDeleteMessageFunc  func(userID, msgID string) (*types.ScheduledMessage, error)
+	ListDeleteMessageFunc  func(userID, msgID string) (*types.ScheduledMessage, error)
 	BuildEphemeralListFunc func(args *model.CommandArgs) *model.CommandResponse
 }
+
+type mockCommandScheduleService struct{}
 
 func (m *mockCommand) Register() error { panic("not implemented") } // Not needed by api.go
 func (m *mockCommand) Execute(*model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	panic("not implemented") // Not needed by api.go
 }
 func (m *mockCommand) UserDeleteMessage(userID, msgID string) (*types.ScheduledMessage, error) {
-	if m.UserDeleteMessageFunc != nil {
-		return m.UserDeleteMessageFunc(userID, msgID)
+	if m.ListDeleteMessageFunc != nil {
+		return m.ListDeleteMessageFunc(userID, msgID)
 	}
 	panic("UserDeleteMessageFunc not set")
 }
@@ -46,18 +50,19 @@ func (m *mockCommand) BuildEphemeralList(args *model.CommandArgs) *model.Command
 	panic("BuildEphemeralListFunc not set")
 }
 
-func setupPluginForAPI(t *testing.T, ctrl *gomock.Controller) (*Plugin, *mock.MockPostService, *mock.MockChannelService, *mockCommand) {
+func setupHandler(t *testing.T, ctrl *gomock.Controller) (*api.Handler, *mock.MockPostService, *mock.MockChannelService, *mockCommand) {
 	t.Helper()
 	postMock := mock.NewMockPostService(ctrl)
 	channelMock := mock.NewMockChannelService(ctrl)
 	cmdMock := &mockCommand{}
-
-	p := &Plugin{
-		logger:  &testutil.FakeLogger{},
-		poster:  postMock,
-		Channel: channelMock,
-		Command: cmdMock,
+	p := &api.Handler{
+		logger:          &testutil.FakeLogger{},
+		poster:          postMock,
+		Command:         cmdMock,
+		ScheduleService: command.NewScheduleService(),
+		Channel:         channelMock,
 	}
+
 	return p, postMock, channelMock, cmdMock
 }
 
@@ -81,7 +86,7 @@ func createDeleteRequest(t *testing.T, userID, postID, channelID, action, msgID 
 }
 
 func TestMattermostAuthorizationRequired_Unauthorized(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &api.Handler{logger: &testutil.FakeLogger{}}
 	handlerCalled := false
 	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handlerCalled = true
@@ -99,7 +104,7 @@ func TestMattermostAuthorizationRequired_Unauthorized(t *testing.T) {
 }
 
 func TestMattermostAuthorizationRequired_Authorized(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	handlerCalled := false
 	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handlerCalled = true
@@ -117,7 +122,7 @@ func TestMattermostAuthorizationRequired_Authorized(t *testing.T) {
 }
 
 func TestParseDeleteRequest_MalformedJSON(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("{invalid json"))
 	_, _, err := parseDeleteRequest(p, r)
 	require.Error(t, err)
@@ -136,7 +141,7 @@ func TestParseDeleteRequest_MissingContextFields(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			p := &Plugin{logger: &testutil.FakeLogger{}}
+			p := &Handler{logger: &testutil.FakeLogger{}}
 			reqBody := model.PostActionIntegrationRequest{Context: tc.context}
 			b, _ := json.Marshal(reqBody)
 			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(b))
@@ -148,7 +153,7 @@ func TestParseDeleteRequest_MissingContextFields(t *testing.T) {
 }
 
 func TestParseDeleteRequest_WrongAction(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	reqBody := model.PostActionIntegrationRequest{Context: map[string]any{"action": "not-delete", "id": "msg123"}}
 	b, _ := json.Marshal(reqBody)
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(b))
@@ -158,7 +163,7 @@ func TestParseDeleteRequest_WrongAction(t *testing.T) {
 }
 
 func TestParseDeleteRequest_Valid(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	reqBody := model.PostActionIntegrationRequest{
 		PostId:    "post1",
 		ChannelId: "chan1",
@@ -176,7 +181,7 @@ func TestParseDeleteRequest_Valid(t *testing.T) {
 func TestServeHTTP_Delete_AuthFail(t *testing.T) { // TC-3.1
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, _, _, _ := setupPluginForAPI(t, ctrl)
+	p, _, _, _ := setupHandler(t, ctrl)
 
 	req := createDeleteRequest(t, "", "post1", "chan1", "delete", "msg1")
 	rr := httptest.NewRecorder()
@@ -190,7 +195,7 @@ func TestServeHTTP_Delete_AuthFail(t *testing.T) { // TC-3.1
 func TestServeHTTP_Delete_BadRequestBody(t *testing.T) { // TC-3.2
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, _, _, _ := setupPluginForAPI(t, ctrl)
+	p, _, _, _ := setupHandler(t, ctrl)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/delete", strings.NewReader("{bad json"))
 	req.Header.Set(constants.HTTPHeaderMattermostUserID, "u1")
@@ -205,7 +210,7 @@ func TestServeHTTP_Delete_BadRequestBody(t *testing.T) { // TC-3.2
 func TestServeHTTP_Delete_InvalidContext(t *testing.T) { // TC-3.3
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, _, _, _ := setupPluginForAPI(t, ctrl)
+	p, _, _, _ := setupHandler(t, ctrl)
 
 	req := createDeleteRequest(t, "u1", "post1", "chan1", "wrong-action", "msg1")
 	rr := httptest.NewRecorder()
@@ -219,7 +224,7 @@ func TestServeHTTP_Delete_InvalidContext(t *testing.T) { // TC-3.3
 func TestServeHTTP_Delete_CommandLayerFailure(t *testing.T) { // TC-3.4
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, _, cmdMock := setupPluginForAPI(t, ctrl)
+	p, postMock, _, cmdMock := setupHandler(t, ctrl)
 
 	userID := "u1"
 	postID := "post456"
@@ -227,7 +232,7 @@ func TestServeHTTP_Delete_CommandLayerFailure(t *testing.T) { // TC-3.4
 	channelID := "chanABC"
 	commandErrorMessage := "command layer boom"
 
-	cmdMock.UserDeleteMessageFunc = func(userID, msgID string) (*types.ScheduledMessage, error) {
+	cmdMock.ListDeleteMessageFunc = func(userID, msgID string) (*types.ScheduledMessage, error) {
 		assert.Equal(t, userID, userID)
 		assert.Equal(t, msgID, msgID)
 		return nil, errors.New(commandErrorMessage)
@@ -262,7 +267,7 @@ func TestServeHTTP_Delete_CommandLayerFailure(t *testing.T) { // TC-3.4
 func TestServeHTTP_Delete_HappyPath_NormalTimezone(t *testing.T) { // TC-3.5
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, channelMock, cmdMock := setupPluginForAPI(t, ctrl)
+	p, postMock, channelMock, cmdMock := setupHandler(t, ctrl)
 
 	userID := "u1"
 	msgID := "msg999"
@@ -274,7 +279,7 @@ func TestServeHTTP_Delete_HappyPath_NormalTimezone(t *testing.T) { // TC-3.5
 	expectedChannelLink := "~town-square"
 
 	// Command Mock Setup
-	cmdMock.UserDeleteMessageFunc = func(u, id string) (*types.ScheduledMessage, error) {
+	cmdMock.ListDeleteMessageFunc = func(u, id string) (*types.ScheduledMessage, error) {
 		assert.Equal(t, userID, u)
 		assert.Equal(t, msgID, id)
 		return &types.ScheduledMessage{
@@ -325,7 +330,7 @@ func TestServeHTTP_Delete_HappyPath_NormalTimezone(t *testing.T) { // TC-3.5
 func TestServeHTTP_Delete_HappyPath_InvalidTimezoneFallback(t *testing.T) { // TC-3.6
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, channelMock, cmdMock := setupPluginForAPI(t, ctrl)
+	p, postMock, channelMock, cmdMock := setupHandler(t, ctrl)
 
 	userID := "u1"
 	msgID := "msg999"
@@ -337,7 +342,7 @@ func TestServeHTTP_Delete_HappyPath_InvalidTimezoneFallback(t *testing.T) { // T
 	expectedChannelLink := "~town-square"
 
 	// Command Mock Setup (only difference is the timezone)
-	cmdMock.UserDeleteMessageFunc = func(u, id string) (*types.ScheduledMessage, error) {
+	cmdMock.ListDeleteMessageFunc = func(u, id string) (*types.ScheduledMessage, error) {
 		return &types.ScheduledMessage{
 			ID:        msgID,
 			UserID:    userID,
@@ -375,7 +380,7 @@ func TestServeHTTP_Delete_HappyPath_InvalidTimezoneFallback(t *testing.T) { // T
 func TestUpdateEphemeralPostWithList(t *testing.T) { // TC-4.1
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, _, _ := setupPluginForAPI(t, ctrl)
+	p, postMock, _, _ := setupHandler(t, ctrl)
 
 	userID := "user123"
 	postID := "post456"
@@ -397,7 +402,7 @@ func TestUpdateEphemeralPostWithList(t *testing.T) { // TC-4.1
 func TestSendDeletionConfirmation_NormalTimezone(t *testing.T) { // TC-5.1
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, channelMock, _ := setupPluginForAPI(t, ctrl)
+	p, postMock, channelMock, _ := setupHandler(t, ctrl)
 
 	userID := "user1"
 	channelID := "chan1"                            // Channel where confirmation is sent
@@ -429,7 +434,7 @@ func TestSendDeletionConfirmation_NormalTimezone(t *testing.T) { // TC-5.1
 }
 
 func TestBuildEphemeralListUpdate_EmptyAttachments(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	userID := "user-empty"
 	postID := "post-empty"
 	channelID := "chan-empty"
@@ -449,7 +454,7 @@ func TestBuildEphemeralListUpdate_EmptyAttachments(t *testing.T) {
 }
 
 func TestBuildEphemeralListUpdate_NilAttachments(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	userID := "user-nil"
 	postID := "post-nil"
 	channelID := "chan-nil"
@@ -474,7 +479,7 @@ func TestBuildEphemeralListUpdate_NilAttachments(t *testing.T) {
 }
 
 func TestBuildEphemeralListUpdate_WrongTypeAttachments(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	userID := "user-wrongtype"
 	postID := "post-wrongtype"
 	channelID := "chan-wrongtype"
@@ -493,7 +498,7 @@ func TestBuildEphemeralListUpdate_WrongTypeAttachments(t *testing.T) {
 }
 
 func TestBuildEphemeralListUpdate_NonEmptyAttachments(t *testing.T) {
-	p := &Plugin{logger: &testutil.FakeLogger{}}
+	p := &Handler{logger: &testutil.FakeLogger{}}
 	userID := "user-nonempty"
 	postID := "post-nonempty"
 	channelID := "chan-nonempty"
@@ -515,7 +520,7 @@ func TestBuildEphemeralListUpdate_NonEmptyAttachments(t *testing.T) {
 func TestSendDeletionConfirmation_InvalidTimezoneFallback(t *testing.T) { // TC-5.2
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	p, postMock, channelMock, _ := setupPluginForAPI(t, ctrl)
+	p, postMock, channelMock, _ := setupHandler(t, ctrl)
 
 	userID := "user1"
 	channelID := "chan1"

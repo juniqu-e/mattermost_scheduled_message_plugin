@@ -72,6 +72,38 @@ func (s *ScheduleService) Build(args *model.CommandArgs, text string) *model.Com
 	return s.successResponse(msg, localTime, tz, args.ChannelId)
 }
 
+func (s *ScheduleService) ApiBuild(userId string, channelId string, file_ids []string, text string) *model.CommandResponse {
+	s.logger.Debug("Attempting to schedule message", "user_id", userId, "channel_id", channelId, "text", text)
+
+	s.logger.Debug("Validating schedule request", "user_id", userId)
+	if resp := s.validateRequest(userId, text); resp != nil {
+		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
+		return resp
+	}
+	s.logger.Debug("Schedule request validated successfully", "user_id", userId)
+
+	s.logger.Debug("Preparing schedule details", "user_id", userId, "channel_id", channelId)
+	msg, loc, tz, err := s.prepareSchedule(userId, channelId, text)
+	if err != nil {
+		errMsg := fmt.Sprintf("Error preparing schedule: %v, Original input: `%v`", err, text)
+		s.logger.Error("Failed to prepare schedule", "user_id", userId, "channel_id", channelId, "error", err, "original_text", text)
+		return s.errorResponse(errMsg)
+	}
+	localTime := msg.PostAt.In(loc)
+	s.logger.Debug("Schedule details prepared", "user_id", userId, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
+
+	s.logger.Debug("Persisting scheduled message", "user_id", userId, "message_id", msg.ID)
+	if err := s.persist(userId, msg); err != nil {
+		channelLink := s.channel.MakeChannelLink(s.channel.GetInfoOrUnknown(channelId))
+		formatted := formatter.FormatScheduleError(localTime, tz, channelLink, err)
+		s.logger.Error("Failed to persist scheduled message", "user_id", userId, "message_id", msg.ID, "error", err)
+		return s.errorResponse(formatted)
+	}
+	s.logger.Info("Scheduled message persisted successfully", "user_id", userId, "message_id", msg.ID)
+
+	return s.successResponse(msg, localTime, tz, channelId)
+}
+
 func (s *ScheduleService) checkMaxUserMessages(userID string) error {
 	s.logger.Debug("Checking max user messages limit", "user_id", userID, "limit", s.maxUserMessages)
 	ids, err := s.store.ListUserMessageIDs(userID)
