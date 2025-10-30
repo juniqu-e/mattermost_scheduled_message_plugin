@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
-	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
 
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/mattermost/mattermost/server/public/model"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mm"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
@@ -13,8 +15,6 @@ import (
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/store"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
-	"github.com/golang/mock/gomock"
-	"github.com/mattermost/mattermost/server/public/model"
 )
 
 func TestProcessDueMessages_PostSuccess(t *testing.T) {

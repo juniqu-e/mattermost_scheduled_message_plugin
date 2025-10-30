@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	"github.com/mattermost/mattermost/server/public/pluginapi"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/testutil"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
-	"github.com/golang/mock/gomock"
-	"github.com/google/uuid"
-	"github.com/mattermost/mattermost/server/public/pluginapi"
 )
 
 type fakeListMatching struct{ prefixCalled string }

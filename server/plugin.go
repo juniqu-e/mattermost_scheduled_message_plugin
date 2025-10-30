@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/mattermost/mattermost/server/public/plugin"
+	"github.com/mattermost/mattermost/server/public/pluginapi"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mm"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/bot"
@@ -15,9 +18,6 @@ import (
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/scheduler"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/store"
-	"github.com/mattermost/mattermost/server/public/model"
-	"github.com/mattermost/mattermost/server/public/plugin"
-	"github.com/mattermost/mattermost/server/public/pluginapi"
 )
 
 type ClientFactory func(api plugin.API, drv plugin.Driver) *pluginapi.Client

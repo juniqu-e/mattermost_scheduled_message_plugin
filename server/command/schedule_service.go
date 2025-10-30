@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mattermost/mattermost/server/public/model"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/formatter"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
-	"github.com/mattermost/mattermost/server/public/model"
 )
 
 type ScheduleService struct {
