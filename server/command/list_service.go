@@ -145,7 +145,7 @@ func createAttachment(text string, messageID string) *model.SlackAttachment {
 				Name:  "Delete",
 				Style: "danger",
 				Integration: &model.PostActionIntegration{
-					URL: "/plugins/com.mattermost.plugin-poor-mans-scheduled-messages/api/v1/delete",
+					URL: "/plugins/com.mattermost-plugin-schedule-message-gui/api/v1/delete",
 					Context: map[string]any{
 						"action": "delete",
 						"id":     messageID,
