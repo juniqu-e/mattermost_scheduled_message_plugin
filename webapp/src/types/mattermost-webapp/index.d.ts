@@ -26,11 +26,47 @@ export interface OverlayTriggerProps {
     children: React.ReactElement;
 }
 
+export interface ModalProps {
+    show: boolean;
+    onHide: () => void;
+    dialogClassName?: string;
+    backdrop?: 'static' | true | false;
+    children?: React.ReactNode;
+}
+
+export interface ModalHeaderProps {
+    closeButton?: boolean;
+    children?: React.ReactNode;
+}
+
+export interface ModalTitleProps {
+    children?: React.ReactNode;
+}
+
+export interface ModalBodyProps {
+    children?: React.ReactNode;
+}
+
+export interface ModalFooterProps {
+    children?: React.ReactNode;
+}
+
 declare global {
     interface Window {
         ReactBootstrap: {
             OverlayTrigger: React.ComponentType<OverlayTriggerProps>;
             Tooltip: React.ComponentType<TooltipProps>;
+            Modal: React.ComponentType<ModalProps> & {
+                Header: React.ComponentType<ModalHeaderProps>;
+                Title: React.ComponentType<ModalTitleProps>;
+                Body: React.ComponentType<ModalBodyProps>;
+                Footer: React.ComponentType<ModalFooterProps>;
+            };
+        };
+        store?: {
+            getState: () => any;
+            dispatch: (action: any) => any;
+            subscribe: (listener: () => void) => () => void;
         };
     }
 }
