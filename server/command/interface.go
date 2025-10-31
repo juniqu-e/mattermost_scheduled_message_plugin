@@ -1,8 +1,8 @@
 package command
 
 import (
-	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 	"github.com/mattermost/mattermost/server/public/model"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
 
 type Interface interface {

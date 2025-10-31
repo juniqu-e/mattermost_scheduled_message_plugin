@@ -92,4 +92,5 @@ type ListService interface {
 
 type ScheduleService interface {
 	Build(args *model.CommandArgs, text string) *model.CommandResponse
+	BuildPost(userId string, channelId string, fileIds []string, text string) (*model.Post, error)
 }

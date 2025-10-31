@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/mattermost/mattermost/server/public/model"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
-	"github.com/mattermost/mattermost/server/public/model"
 )
 
 func EnsureBot(botAPI ports.BotService, imgSvc ports.BotProfileImageService) (string, error) {
 	bot := &model.Bot{
 		Username:    "scheduled-messages",
 		DisplayName: "Message Scheduler",
-		Description: "Poor Man's Scheduled Messages Bot",
+		Description: "Scheduled Messages Bot",
 	}
 	profileImagePath := filepath.Join(constants.AssetsDir, constants.ProfileImageFilename)
 	profileImage := imgSvc.ProfileImagePath(profileImagePath)

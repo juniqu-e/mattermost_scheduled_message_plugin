@@ -2,12 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 
+	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/mattermost/mattermost/server/public/plugin"
+	"github.com/mattermost/mattermost/server/public/pluginapi"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mm"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
+	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/api"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/bot"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/channel"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/clock"
@@ -15,9 +20,6 @@ import (
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/scheduler"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/store"
-	"github.com/mattermost/mattermost/server/public/model"
-	"github.com/mattermost/mattermost/server/public/plugin"
-	"github.com/mattermost/mattermost/server/public/pluginapi"
 )
 
 type ClientFactory func(api plugin.API, drv plugin.Driver) *pluginapi.Client
@@ -38,6 +40,13 @@ type AppBuilder interface {
 		scheduleSvc ports.ScheduleService,
 		help string,
 	) *command.Handler
+	NewAPIHandler(
+		cli *pluginapi.Client,
+		poster ports.PostService,
+		Channel ports.ChannelService,
+		Command command.Interface,
+		ScheduleService *command.ScheduleService,
+	) *api.Handler
 }
 
 type prodBuilder struct{}
@@ -74,6 +83,22 @@ func (prodBuilder) NewCommandHandler(
 	)
 }
 
+func (prodBuilder) NewAPIHandler(
+	cli *pluginapi.Client,
+	poster ports.PostService,
+	Channel ports.ChannelService,
+	Command command.Interface,
+	ScheduleService *command.ScheduleService,
+) *api.Handler {
+	return api.NewHandler(
+		&cli.Log,
+		poster,
+		Channel,
+		Command,
+		ScheduleService,
+	)
+}
+
 type Plugin struct {
 	plugin.MattermostPlugin
 	// configurationLock synchronizes access to the configuration.
@@ -91,6 +116,7 @@ type Plugin struct {
 	helpText               string
 	logger                 ports.Logger
 	poster                 ports.PostService
+	api                    api.Interface
 }
 
 func (p *Plugin) loadHelpText(text string) (string, error) {
@@ -213,6 +239,15 @@ func (p *Plugin) initialize(botID string, clk ports.Clock, builder AppBuilder) e
 		p.helpText,
 	)
 
+	p.logger.Debug("Initializing Api Handler")
+	p.api = builder.NewAPIHandler(
+		p.client,
+		p.poster,
+		p.Channel,
+		p.Command,
+		scheduleService,
+	)
+
 	p.logger.Debug("Registering command handler")
 	if err := p.Command.Register(); err != nil {
 		p.logger.Error("Failed to register command handler", "error", err)
@@ -236,4 +271,9 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		p.logger.Debug("Command execution successful", "user_id", args.UserId, "command", args.Command)
 	}
 	return resp, appErr
+}
+
+func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
+	p.logger.Debug("Received HTTP request", "method", r.Method, "url", r.URL.String())
+	p.api.ServeHTTP(c, w, r)
 }

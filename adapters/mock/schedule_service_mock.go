@@ -47,3 +47,19 @@ func (mr *MockScheduleServiceMockRecorder) Build(arg0, arg1 interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Build", reflect.TypeOf((*MockScheduleService)(nil).Build), arg0, arg1)
 }
+
+
+// Build mocks base method.
+func (m *MockScheduleService) BuildPost(arg0 string, arg1 string, arg2 []string, arg3 string) (*model.Post, error){
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BuildPost", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*model.Post)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Build indicates an expected call of Build.
+func (mr *MockScheduleServiceMockRecorder) BuildPost(arg0 string, arg1 string, arg2 []string, arg3 string) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildPost", reflect.TypeOf((*MockScheduleService)(nil).Build), arg0, arg1, arg2, arg3)
+}
