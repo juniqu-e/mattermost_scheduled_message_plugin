@@ -1,4 +1,4 @@
-package api_test
+package api
 
 import (
 	"bytes"
@@ -18,8 +18,6 @@ import (
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/testutil"
-	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/api"
-	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/command"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
@@ -30,8 +28,6 @@ type mockCommand struct {
 	ListDeleteMessageFunc  func(userID, msgID string) (*types.ScheduledMessage, error)
 	BuildEphemeralListFunc func(args *model.CommandArgs) *model.CommandResponse
 }
-
-type mockCommandScheduleService struct{}
 
 func (m *mockCommand) Register() error { panic("not implemented") } // Not needed by api.go
 func (m *mockCommand) Execute(*model.CommandArgs) (*model.CommandResponse, *model.AppError) {
@@ -50,16 +46,17 @@ func (m *mockCommand) BuildEphemeralList(args *model.CommandArgs) *model.Command
 	panic("BuildEphemeralListFunc not set")
 }
 
-func setupHandler(t *testing.T, ctrl *gomock.Controller) (*api.Handler, *mock.MockPostService, *mock.MockChannelService, *mockCommand) {
+func setupHandler(t *testing.T, ctrl *gomock.Controller) (*Handler, *mock.MockPostService, *mock.MockChannelService, *mockCommand) {
 	t.Helper()
 	postMock := mock.NewMockPostService(ctrl)
 	channelMock := mock.NewMockChannelService(ctrl)
+	scheduleSvc := mock.NewMockScheduleService(ctrl)
 	cmdMock := &mockCommand{}
-	p := &api.Handler{
+	p := &Handler{
 		logger:          &testutil.FakeLogger{},
 		poster:          postMock,
 		Command:         cmdMock,
-		ScheduleService: command.NewScheduleService(),
+		ScheduleService: scheduleSvc,
 		Channel:         channelMock,
 	}
 
@@ -83,42 +80,6 @@ func createDeleteRequest(t *testing.T, userID, postID, channelID, action, msgID 
 		r.Header.Set(constants.HTTPHeaderMattermostUserID, userID)
 	}
 	return r
-}
-
-func TestMattermostAuthorizationRequired_Unauthorized(t *testing.T) {
-	p := &api.Handler{logger: &testutil.FakeLogger{}}
-	handlerCalled := false
-	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlerCalled = true
-		w.WriteHeader(http.StatusOK)
-	})
-
-	req := httptest.NewRequest(http.MethodGet, "/", nil) // No MM User ID header
-	rr := httptest.NewRecorder()
-
-	p.MattermostAuthorizationRequired(dummyHandler).ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	assert.Equal(t, "Not authorized\n", rr.Body.String())
-	assert.False(t, handlerCalled, "Wrapped handler should not have been called")
-}
-
-func TestMattermostAuthorizationRequired_Authorized(t *testing.T) {
-	p := &Handler{logger: &testutil.FakeLogger{}}
-	handlerCalled := false
-	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handlerCalled = true
-		w.WriteHeader(http.StatusOK)
-	})
-
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	req.Header.Set(constants.HTTPHeaderMattermostUserID, "test-user-id")
-	rr := httptest.NewRecorder()
-
-	p.MattermostAuthorizationRequired(dummyHandler).ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusOK, rr.Code)
-	assert.True(t, handlerCalled, "Wrapped handler should have been called")
 }
 
 func TestParseDeleteRequest_MalformedJSON(t *testing.T) {

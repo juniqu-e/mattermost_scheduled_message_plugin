@@ -13,7 +13,7 @@ type Handler struct {
 	logger          ports.Logger
 	poster          ports.PostService
 	Command         command.Interface
-	ScheduleService *command.ScheduleService
+	ScheduleService ports.ScheduleService
 	Channel         ports.ChannelService
 }
 
@@ -22,7 +22,7 @@ func NewHandler(
 	poster ports.PostService,
 	Channel ports.ChannelService,
 	Command command.Interface,
-	ScheduleService *command.ScheduleService,
+	ScheduleService ports.ScheduleService,
 ) *Handler {
 	logger.Debug("Creating new api Handler")
 	return &Handler{

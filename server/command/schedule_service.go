@@ -72,22 +72,42 @@ func (s *ScheduleService) Build(args *model.CommandArgs, text string) *model.Com
 	return s.successResponse(msg, localTime, tz, args.ChannelId)
 }
 
-func (s *ScheduleService) ApiBuild(userId string, channelId string, file_ids []string, text string) *model.CommandResponse {
+func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []string, text string) *model.Post {
 	s.logger.Debug("Attempting to schedule message", "user_id", userId, "channel_id", channelId, "text", text)
 
 	s.logger.Debug("Validating schedule request", "user_id", userId)
 	if resp := s.validateRequest(userId, text); resp != nil {
 		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
-		return resp
+
+		return &model.Post{
+			UserId: userId,
+			ChannelId: channelId,
+			Message: resp.Text,
+		}
+	}
+
+	if resp := s.validateFileIds(userId, fileIds); resp != nil{
+		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
+		return &model.Post{
+			UserId: userId,
+			ChannelId: channelId,
+			Message: resp.Text,
+		}
 	}
 	s.logger.Debug("Schedule request validated successfully", "user_id", userId)
 
 	s.logger.Debug("Preparing schedule details", "user_id", userId, "channel_id", channelId)
+
 	msg, loc, tz, err := s.prepareSchedule(userId, channelId, text)
 	if err != nil {
 		errMsg := fmt.Sprintf("Error preparing schedule: %v, Original input: `%v`", err, text)
 		s.logger.Error("Failed to prepare schedule", "user_id", userId, "channel_id", channelId, "error", err, "original_text", text)
-		return s.errorResponse(errMsg)
+
+		return &model.Post{
+			UserId: userId,
+			ChannelId: channelId,
+			Message: errMsg,
+		}
 	}
 	localTime := msg.PostAt.In(loc)
 	s.logger.Debug("Schedule details prepared", "user_id", userId, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
@@ -97,11 +117,20 @@ func (s *ScheduleService) ApiBuild(userId string, channelId string, file_ids []s
 		channelLink := s.channel.MakeChannelLink(s.channel.GetInfoOrUnknown(channelId))
 		formatted := formatter.FormatScheduleError(localTime, tz, channelLink, err)
 		s.logger.Error("Failed to persist scheduled message", "user_id", userId, "message_id", msg.ID, "error", err)
-		return s.errorResponse(formatted)
+
+		return &model.Post{
+			UserId: userId,
+			ChannelId: channelId,
+			Message: formatted,
+		}
 	}
 	s.logger.Info("Scheduled message persisted successfully", "user_id", userId, "message_id", msg.ID)
 
-	return s.successResponse(msg, localTime, tz, channelId)
+	return &model.Post{
+			UserId: userId,
+			ChannelId: channelId,
+			Message: s.successResponse(msg, localTime, tz, channelId).Text,
+	}
 }
 
 func (s *ScheduleService) checkMaxUserMessages(userID string) error {
@@ -177,6 +206,19 @@ func (s *ScheduleService) validateRequest(userID, text string) *model.CommandRes
 		return s.errorResponse(formatter.FormatEmptyCommandError())
 	}
 	s.logger.Debug("Request validation successful", "user_id", userID)
+	return nil
+}
+
+func (s *ScheduleService) validateFileIds(userID string, fileIds []string) *model.CommandResponse {
+	s.logger.Debug("Starting request FileIds validation", "user_id", userID)
+	if fileIds == nil{
+		return nil
+	}
+
+	if len(fileIds) > 5 {
+		return s.errorResponse(formatter.FormatScheduleValidationError(fmt.Errorf("The number of files cannot exceed 5.")))
+	}
+
 	return nil
 }
 
