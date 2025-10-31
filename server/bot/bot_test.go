@@ -38,7 +38,7 @@ func TestEnsureBot(t *testing.T) {
 				if b.DisplayName != "Message Scheduler" {
 					t.Fatalf("unexpected display name %s", b.DisplayName)
 				}
-				if b.Description != "Poor Man's Scheduled Messages Bot" {
+				if b.Description != "Scheduled Messages Bot" {
 					t.Fatalf("unexpected description %s", b.Description)
 				}
 				return "bot123", nil
