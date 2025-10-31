@@ -44,6 +44,7 @@ func (h *Handler) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Re
 	// Set up /api/v1 routes.
 	api := router.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc("/delete", h.ListDeleteMessage).Methods(http.MethodPost)
+	api.HandleFunc("/schedule", h.CreateSchedule).Methods(http.MethodPost)
 
 	router.ServeHTTP(w, r)
 }

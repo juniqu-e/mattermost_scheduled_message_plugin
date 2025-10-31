@@ -50,11 +50,12 @@ func (mr *MockScheduleServiceMockRecorder) Build(arg0, arg1 interface{}) *gomock
 
 
 // Build mocks base method.
-func (m *MockScheduleService) BuildPost(arg0 string, arg1 string, arg2 []string, arg3 string) *model.Post{
+func (m *MockScheduleService) BuildPost(arg0 string, arg1 string, arg2 []string, arg3 string) (*model.Post, error){
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BuildPost", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(*model.Post)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Build indicates an expected call of Build.

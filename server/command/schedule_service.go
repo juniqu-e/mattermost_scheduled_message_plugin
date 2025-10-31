@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -72,27 +73,30 @@ func (s *ScheduleService) Build(args *model.CommandArgs, text string) *model.Com
 	return s.successResponse(msg, localTime, tz, args.ChannelId)
 }
 
-func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []string, text string) *model.Post {
+func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []string, text string) (*model.Post, error) {
 	s.logger.Debug("Attempting to schedule message", "user_id", userId, "channel_id", channelId, "text", text)
 
 	s.logger.Debug("Validating schedule request", "user_id", userId)
 	if resp := s.validateRequest(userId, text); resp != nil {
 		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
 
+		errMsg := resp.Text
 		return &model.Post{
-			UserId: userId,
+			UserId:    userId,
 			ChannelId: channelId,
-			Message: resp.Text,
-		}
+			Message:   errMsg,
+		}, errors.New(errMsg)
 	}
 
-	if resp := s.validateFileIds(userId, fileIds); resp != nil{
+	s.logger.Debug("Validating schedule file_ids", "user_id", userId, "file_ids", fileIds)
+	if resp := s.validateFileIds(userId, fileIds); resp != nil {
 		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
+		errMsg := resp.Text
 		return &model.Post{
-			UserId: userId,
+			UserId:    userId,
 			ChannelId: channelId,
-			Message: resp.Text,
-		}
+			Message:   errMsg,
+		}, errors.New(errMsg)
 	}
 	s.logger.Debug("Schedule request validated successfully", "user_id", userId)
 
@@ -104,10 +108,10 @@ func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []s
 		s.logger.Error("Failed to prepare schedule", "user_id", userId, "channel_id", channelId, "error", err, "original_text", text)
 
 		return &model.Post{
-			UserId: userId,
+			UserId:    userId,
 			ChannelId: channelId,
-			Message: errMsg,
-		}
+			Message:   errMsg,
+		}, errors.New(errMsg)
 	}
 	localTime := msg.PostAt.In(loc)
 	s.logger.Debug("Schedule details prepared", "user_id", userId, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
@@ -119,18 +123,18 @@ func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []s
 		s.logger.Error("Failed to persist scheduled message", "user_id", userId, "message_id", msg.ID, "error", err)
 
 		return &model.Post{
-			UserId: userId,
+			UserId:    userId,
 			ChannelId: channelId,
-			Message: formatted,
-		}
+			Message:   formatted,
+		}, err
 	}
 	s.logger.Info("Scheduled message persisted successfully", "user_id", userId, "message_id", msg.ID)
 
 	return &model.Post{
-			UserId: userId,
-			ChannelId: channelId,
-			Message: s.successResponse(msg, localTime, tz, channelId).Text,
-	}
+		UserId:    userId,
+		ChannelId: channelId,
+		Message:   s.successResponse(msg, localTime, tz, channelId).Text,
+	}, nil
 }
 
 func (s *ScheduleService) checkMaxUserMessages(userID string) error {
@@ -211,7 +215,7 @@ func (s *ScheduleService) validateRequest(userID, text string) *model.CommandRes
 
 func (s *ScheduleService) validateFileIds(userID string, fileIds []string) *model.CommandResponse {
 	s.logger.Debug("Starting request FileIds validation", "user_id", userID)
-	if fileIds == nil{
+	if fileIds == nil {
 		return nil
 	}
 
