@@ -71,4 +71,31 @@
     flex-shrink: 0;
 }
 
+/* ---- 바리에이션 2: 아이콘 + 텍스트 ---- */
+.schedule-post-button--with-text {
+    gap: 4px;
+    padding: 0 8px;
+}
+
+.schedule-post-button__text {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* ---- 바리에이션 3: 아이콘 + 텍스트 + 보더 ---- */
+.schedule-post-button--bordered {
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+}
+
+.schedule-post-button--bordered:hover {
+    border-color: rgba(var(--center-channel-color-rgb), 0.24);
+}
+
+.schedule-post-button--bordered:active {
+    border-color: var(--button-bg);
+}
+
 /* Tooltip은 Mattermost의 window.ReactBootstrap.Tooltip 사용 */
