@@ -157,6 +157,7 @@ func (s *Scheduler) postMessage(msg *types.ScheduledMessage) error {
 		ChannelId: msg.ChannelID,
 		Message:   msg.MessageContent,
 		UserId:    msg.UserID,
+		FileIds:   msg.FileIds,
 	}
 	postErr := s.poster.CreatePost(post)
 	if postErr != nil {
@@ -172,6 +173,7 @@ func (s *Scheduler) dmUserOnFailedMessage(msg *types.ScheduledMessage, postErr e
 	message := formatter.FormatSchedulerFailure(channelInfo, postErr, msg.MessageContent)
 	post := &model.Post{
 		Message: message,
+		FileIds: msg.FileIds,
 	}
 	dmErr := s.poster.DM(s.botID, msg.UserID, post)
 	if dmErr != nil {
