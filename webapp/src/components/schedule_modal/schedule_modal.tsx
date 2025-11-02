@@ -3,9 +3,9 @@
 
 import React, {PureComponent} from 'react';
 
-import type {ScheduleModalProps, ScheduleModalState} from '../../types';
-
 import DateTimePicker from './date_time_picker';
+
+import type {ScheduleModalProps, ScheduleModalState} from '../../types';
 
 import './schedule_modal.css';
 

@@ -1,11 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import manifest from 'manifest';
+import {Client4} from 'mattermost-redux/client';
 import React, {PureComponent} from 'react';
 
-import type {SchedulePostButtonProps, FileInfo} from '../../types';
-
 import ScheduleIcon from './schedule_icon';
+
+import type {SchedulePostButtonProps, FileInfo} from '../../types';
 import ScheduleModal from '../schedule_modal';
 
 import './schedule_post_button.css';
@@ -17,6 +19,72 @@ interface SchedulePostButtonState {
     isModalOpen: boolean;
     message: string;
     fileInfos: FileInfo[];
+}
+
+/**
+ * API 요청 타입
+ */
+interface ScheduleMessageRequest {
+    channel_id: string;
+    file_ids: string[];
+    post_at_time: string;
+    post_at_date: string;
+    message: string;
+}
+
+/**
+ * 예약 메시지 API 호출
+ */
+async function scheduleMessage(request: ScheduleMessageRequest): Promise<void> {
+    const url = `/plugins/${manifest.id}/api/v1/schedule`;
+
+    await Client4.doFetch(url, {
+        method: 'POST',
+        body: JSON.stringify(request),
+    });
+}
+
+/**
+ * timestamp를 날짜와 시간으로 분리
+ */
+function formatDateTime(timestamp: number): {date: string; time: string} {
+    const dateObj = new Date(timestamp);
+
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const date = `${year}-${month}-${day}`;
+
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    const time = `${hours}:${minutes}`;
+
+    return {date, time};
+}
+
+/**
+ * Redux store에서 현재 채널 ID 가져오기
+ */
+function getCurrentChannelId(): string | null {
+    try {
+        // @ts-expect-error - window.store는 Mattermost가 제공
+        const state = window.store?.getState();
+        if (!state) {
+            console.error('No Redux store found');
+            return null;
+        }
+
+        const currentChannelId = state.entities?.channels?.currentChannelId;
+        if (!currentChannelId) {
+            console.error('No current channel ID');
+            return null;
+        }
+
+        return currentChannelId;
+    } catch (error) {
+        console.error('Failed to get current channel ID:', error);
+        return null;
+    }
 }
 
 /**
@@ -207,9 +275,54 @@ export default class SchedulePostButton extends PureComponent<SchedulePostButton
     };
 
     /**
+     * 첨부된 파일 삭제
+     */
+    clearAttachedFiles = () => {
+        try {
+            // 방법 1: Redux store의 draft 업데이트
+            // @ts-expect-error - window.store는 Mattermost가 제공
+            const state = window.store?.getState();
+            if (!state) {
+                console.log('No Redux store found for clearing files');
+                return;
+            }
+
+            const currentChannelId = state.entities?.channels?.currentChannelId;
+            if (!currentChannelId) {
+                console.log('No current channel ID for clearing files');
+                return;
+            }
+
+            // Mattermost의 draft 업데이트 action dispatch
+            // @ts-expect-error - window.store는 Mattermost가 제공
+            window.store?.dispatch({
+                type: 'UPDATE_DRAFT',
+                channelId: currentChannelId,
+                draft: {
+                    message: '',
+                    fileInfos: [],
+                    uploadsInProgress: [],
+                },
+            });
+
+            console.log('Cleared attached files from draft');
+
+            // 방법 2: DOM에서 파일 삭제 버튼 클릭 (fallback)
+            const removeButtons = document.querySelectorAll('.post-image__remove, .file-preview__remove');
+            removeButtons.forEach((button) => {
+                if (button instanceof HTMLElement) {
+                    button.click();
+                }
+            });
+        } catch (error) {
+            console.error('Failed to clear attached files:', error);
+        }
+    };
+
+    /**
      * 예약 핸들러
      */
-    handleSchedule = (timestamp: number) => {
+    handleSchedule = async (timestamp: number) => {
         const {message, fileInfos} = this.state;
 
         console.log('Scheduling message:', {
@@ -219,8 +332,45 @@ export default class SchedulePostButton extends PureComponent<SchedulePostButton
             scheduledDate: new Date(timestamp),
         });
 
-        // TODO: 실제 API 호출 구현
-        // await scheduleMessage(timestamp, message, fileInfos);
+        try {
+            // 현재 채널 ID 가져오기
+            const channelId = getCurrentChannelId();
+            if (!channelId) {
+                console.error('Cannot schedule message: No channel ID');
+                alert('Failed to schedule message: Could not determine current channel');
+                return;
+            }
+
+            // timestamp를 날짜와 시간으로 분리
+            const {date, time} = formatDateTime(timestamp);
+
+            // file IDs 추출
+            const fileIds = fileInfos.map((file) => file.id).filter((id) => id);
+
+            // API 호출
+            await scheduleMessage({
+                channel_id: channelId,
+                file_ids: fileIds,
+                post_at_time: time,
+                post_at_date: date,
+                message,
+            });
+
+            console.log('Message scheduled successfully');
+
+            // 메시지 입력창 비우기
+            const textbox = document.querySelector('#post_textbox') as HTMLTextAreaElement;
+            if (textbox) {
+                textbox.value = '';
+                textbox.dispatchEvent(new Event('input', {bubbles: true}));
+            }
+
+            // 첨부된 파일 삭제
+            this.clearAttachedFiles();
+        } catch (error) {
+            console.error('Failed to schedule message:', error);
+            alert(`Failed to schedule message: ${error instanceof Error ? error.message : String(error)}`);
+        }
 
         // 모달 닫기
         this.handleCloseModal();

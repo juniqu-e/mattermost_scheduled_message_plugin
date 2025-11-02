@@ -3,7 +3,11 @@
     "allow": [
       "Bash(command -v npm:*)",
       "WebSearch",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(npx eslint:*)",
+      "Bash(make dist:*)",
+      "Bash(make deploy:*)"
     ],
     "deny": [],
     "ask": []
