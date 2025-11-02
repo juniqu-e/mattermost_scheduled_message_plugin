@@ -114,6 +114,7 @@ func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []s
 		}, errors.New(errMsg)
 	}
 	localTime := msg.PostAt.In(loc)
+	msg.FileIds = fileIds
 	s.logger.Debug("Schedule details prepared", "user_id", userId, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
 
 	s.logger.Debug("Persisting scheduled message", "user_id", userId, "message_id", msg.ID)
