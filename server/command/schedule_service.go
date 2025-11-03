@@ -77,20 +77,9 @@ func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []s
 	s.logger.Debug("Attempting to schedule message", "user_id", userId, "channel_id", channelId, "text", text)
 
 	s.logger.Debug("Validating schedule request", "user_id", userId)
-	if resp := s.validateRequest(userId, text); resp != nil {
+	if resp := s.validateAPIRequest(userId, text, fileIds); resp != nil {
 		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
 
-		errMsg := resp.Text
-		return &model.Post{
-			UserId:    userId,
-			ChannelId: channelId,
-			Message:   errMsg,
-		}, errors.New(errMsg)
-	}
-
-	s.logger.Debug("Validating schedule file_ids", "user_id", userId, "file_ids", fileIds)
-	if resp := s.validateFileIds(userId, fileIds); resp != nil {
-		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
 		errMsg := resp.Text
 		return &model.Post{
 			UserId:    userId,
@@ -170,6 +159,17 @@ func (s *ScheduleService) checkMaxMessageBytes(text string) error {
 	return nil
 }
 
+func (s *ScheduleService) checkMaxFileIds(fileIds []string) error {
+	s.logger.Debug("Checking max FileIds", "fileIds", fileIds)
+	count := len(fileIds)
+	if count > 5 {
+		err := fmt.Errorf("the number of files cannot exceed 5. %v", count)
+		return err
+	}
+
+	return nil
+}
+
 func (s *ScheduleService) getUserTimezone(userID string) string {
 	s.logger.Debug("Attempting to get user timezone", "user_id", userID)
 	user, err := s.userAPI.Get(userID)
@@ -197,6 +197,28 @@ func (s *ScheduleService) getUserTimezone(userID string) string {
 	return tz
 }
 
+func (s *ScheduleService) validateAPIRequest(userID, text string, fileIds []string) *model.CommandResponse {
+	s.logger.Debug("Starting request validation", "user_id", userID)
+	if maxUserMessagesErr := s.checkMaxUserMessages(userID); maxUserMessagesErr != nil {
+		return s.errorResponse(formatter.FormatScheduleValidationError(maxUserMessagesErr))
+	}
+	if maxMessageBytesErr := s.checkMaxMessageBytes(text); maxMessageBytesErr != nil {
+		return s.errorResponse(formatter.FormatScheduleValidationError(maxMessageBytesErr))
+	}
+	if maxFileIdsErr := s.checkMaxFileIds(fileIds); maxFileIdsErr != nil {
+		return s.errorResponse(formatter.FormatScheduleValidationError(maxFileIdsErr))
+	}
+
+	trimmedText := strings.TrimSpace(text)
+	if trimmedText == "" && len(fileIds) == 0 {
+		s.logger.Debug("Validation failed: empty command text", "user_id", userID)
+		return s.errorResponse(formatter.FormatEmptyCommandError())
+	}
+
+	s.logger.Debug("Request validation successful", "user_id", userID)
+	return nil
+}
+
 func (s *ScheduleService) validateRequest(userID, text string) *model.CommandResponse {
 	s.logger.Debug("Starting request validation", "user_id", userID)
 	if maxUserMessagesErr := s.checkMaxUserMessages(userID); maxUserMessagesErr != nil {
@@ -211,19 +233,6 @@ func (s *ScheduleService) validateRequest(userID, text string) *model.CommandRes
 		return s.errorResponse(formatter.FormatEmptyCommandError())
 	}
 	s.logger.Debug("Request validation successful", "user_id", userID)
-	return nil
-}
-
-func (s *ScheduleService) validateFileIds(userID string, fileIds []string) *model.CommandResponse {
-	s.logger.Debug("Starting request FileIds validation", "user_id", userID)
-	if fileIds == nil {
-		return nil
-	}
-
-	if len(fileIds) > 5 {
-		return s.errorResponse(formatter.FormatScheduleValidationError(fmt.Errorf("The number of files cannot exceed 5.")))
-	}
-
 	return nil
 }
 
