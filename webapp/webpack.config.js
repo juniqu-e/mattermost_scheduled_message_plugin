@@ -41,6 +41,9 @@ const config = {
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
         alias: {
             manifest: path.resolve(__dirname, '..', 'plugin.json'),
+            '@/shared': path.resolve(__dirname, 'src/shared'),
+            '@/entities': path.resolve(__dirname, 'src/entities'),
+            '@/features': path.resolve(__dirname, 'src/features'),
         },
     },
     module: {

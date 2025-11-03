@@ -2,6 +2,11 @@
   "compilerOptions": {
     "target": "esnext",
     "baseUrl": "./src",
+    "paths": {
+      "@/shared/*": ["shared/*"],
+      "@/entities/*": ["entities/*"],
+      "@/features/*": ["features/*"]
+    },
     "lib": [
       "dom",
       "dom.iterable",
