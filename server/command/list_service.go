@@ -45,6 +45,34 @@ func (l *ListService) Build(userID string) *model.CommandResponse {
 	return successResponse(attachments)
 }
 
+func (l *ListService) BuildPost(userID string, channelId string) (*model.Post, error) {
+	l.logger.Info("Building scheduled message list for user", "user_id", userID)
+	msgs, err := l.loadMessages(userID)
+	if err != nil {
+		l.logger.Error("Failed to load messages for user", "user_id", userID, "error", err)
+		errMsg := fmt.Sprintf("%s Error retrieving message list: %v", constants.EmojiError, err)
+
+		return &model.Post{
+			UserId:    userID,
+			ChannelId: channelId,
+			Message:   errMsg,
+		}, err
+	}
+	if len(msgs) == 0 {
+		l.logger.Info("User has no scheduled messages", "user_id", userID)
+		return &model.Post{
+			UserId:    userID,
+			ChannelId: channelId,
+			Message:   constants.EmptyListMessage,
+		}, nil
+	}
+
+	l.logger.Debug("Successfully loaded messages, building attachments", "user_id", userID, "count", len(msgs))
+	attachments := l.buildAttachments(msgs)
+	l.logger.Debug("Successfully built attachments for message list", "user_id", userID, "count", len(attachments))
+	return buildSuccessPost(userID, channelId, attachments), nil
+}
+
 func (l *ListService) loadMessages(userID string) ([]*types.ScheduledMessage, error) {
 	l.logger.Debug("Loading scheduled message IDs for user", "user_id", userID)
 	ids, err := l.store.ListUserMessageIDs(userID)
@@ -115,6 +143,20 @@ func (l *ListService) buildAttachments(msgs []*types.ScheduledMessage) []*model.
 
 	l.logger.Debug("Finished building all attachments", "count", len(attachments))
 	return attachments
+}
+
+func buildSuccessPost(userId string, channelId string, atts []*model.SlackAttachment) *model.Post {
+	post := &model.Post{
+		UserId:    userId,
+		ChannelId: channelId,
+		Message:   constants.ListHeader,
+	}
+
+	post.SetProps(map[string]any{
+		"attachments": atts,
+	})
+
+	return post
 }
 
 func errorResponse(txt string) *model.CommandResponse {
