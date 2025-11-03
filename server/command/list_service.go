@@ -72,6 +72,9 @@ func (l *ListService) loadMessages(userID string) ([]*types.ScheduledMessage, er
 			continue
 		}
 		l.logger.Debug("Successfully loaded scheduled message", "user_id", userID, "message_id", msg.ID)
+
+		msg.MessageContent = fmt.Sprintf("\\+ %v files\n%s", len(msg.FileIds), msg.MessageContent)
+
 		msgs = append(msgs, msg)
 	}
 
