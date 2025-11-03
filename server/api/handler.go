@@ -14,6 +14,7 @@ type Handler struct {
 	poster          ports.PostService
 	Command         command.Interface
 	ScheduleService ports.ScheduleService
+	ListService     ports.ListService
 	Channel         ports.ChannelService
 }
 
@@ -22,6 +23,7 @@ func NewHandler(
 	poster ports.PostService,
 	Channel ports.ChannelService,
 	Command command.Interface,
+	ListService ports.ListService,
 	ScheduleService ports.ScheduleService,
 ) *Handler {
 	logger.Debug("Creating new api Handler")
@@ -30,6 +32,7 @@ func NewHandler(
 		poster:          poster,
 		Channel:         Channel,
 		Command:         Command,
+		ListService:     ListService,
 		ScheduleService: ScheduleService,
 	}
 }
@@ -45,6 +48,7 @@ func (h *Handler) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Re
 	api := router.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc("/delete", h.ListDeleteMessage).Methods(http.MethodPost)
 	api.HandleFunc("/schedule", h.CreateSchedule).Methods(http.MethodPost)
+	api.HandleFunc("/schedule/{channelId}", h.GetSchedules).Methods(http.MethodGet)
 
 	router.ServeHTTP(w, r)
 }

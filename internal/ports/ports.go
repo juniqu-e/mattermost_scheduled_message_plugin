@@ -88,6 +88,7 @@ type Scheduler interface {
 
 type ListService interface {
 	Build(userID string) *model.CommandResponse
+	BuildPost(userID string, channelId string) (*model.Post, error)
 }
 
 type ScheduleService interface {

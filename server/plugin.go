@@ -45,6 +45,7 @@ type AppBuilder interface {
 		poster ports.PostService,
 		Channel ports.ChannelService,
 		Command command.Interface,
+		ListStervice ports.ListService,
 		ScheduleService *command.ScheduleService,
 	) *api.Handler
 }
@@ -88,6 +89,7 @@ func (prodBuilder) NewAPIHandler(
 	poster ports.PostService,
 	Channel ports.ChannelService,
 	Command command.Interface,
+	ListStervice ports.ListService,
 	ScheduleService *command.ScheduleService,
 ) *api.Handler {
 	return api.NewHandler(
@@ -95,6 +97,7 @@ func (prodBuilder) NewAPIHandler(
 		poster,
 		Channel,
 		Command,
+		ListStervice,
 		ScheduleService,
 	)
 }
@@ -245,6 +248,7 @@ func (p *Plugin) initialize(botID string, clk ports.Clock, builder AppBuilder) e
 		p.poster,
 		p.Channel,
 		p.Command,
+		listService,
 		scheduleService,
 	)
 
