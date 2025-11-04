@@ -154,24 +154,14 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
                     placement='top'
                     overlay={tooltip}
                 >
-                    {/* ============================================
-                        바리에이션 선택:
-                        아래 3가지 버튼 중 하나의 주석을 해제하세요
-                        ============================================ */}
+                    {/*
+                        반응형 버튼:
+                        - 포매팅바 > 640px: 아이콘 + "예약" 텍스트 표시
+                        - 포매팅바 ≤ 640px: 아이콘만 표시
+                        - 포매팅바 ≤ 350px: 버튼 전체 숨김
 
-                    {/* 바리에이션 1: 아이콘만 (기본) */}
-                    {/* <button
-                        type='button'
-                        className='schedule-post-button'
-                        onClick={handleClick}
-                        aria-label='Schedule message'
-                    >
-                        <span className='schedule-post-button__icon'>
-                            <ScheduleIcon/>
-                        </span>
-                    </button> */}
-
-                    {/* 바리에이션 2: 아이콘 + 텍스트 (반응형) */}
+                        Mattermost의 포매팅바와 동일한 타이밍으로 반응
+                    */}
                     <button
                         ref={buttonRef}
                         type='button'
@@ -188,21 +178,6 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
                             </span>
                         )}
                     </button>
-
-                    {/* 바리에이션 3: 아이콘 + 텍스트 + 보더 */}
-                    {/* <button
-                        type='button'
-                        className='schedule-post-button schedule-post-button--with-text schedule-post-button--bordered'
-                        onClick={handleClick}
-                        aria-label='Schedule message'
-                    >
-                        <span className='schedule-post-button__icon'>
-                            <ScheduleIcon/>
-                        </span>
-                        <span className='schedule-post-button__text'>
-                            {'예약'}
-                        </span>
-                    </button> */}
                 </OverlayTrigger>
             </div>
 

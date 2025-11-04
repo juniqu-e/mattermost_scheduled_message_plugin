@@ -17,9 +17,3 @@ export const MAX_FILE_COUNT = 10;
  * @see server/constants/constants.go:11
  */
 export const MAX_MESSAGE_BYTES = 50 * 1024; // 50KB
-
-/**
- * 사용자당 최대 예약 메시지 개수
- * @see server/constants/constants.go:9
- */
-export const MAX_USER_MESSAGES = 1000;
