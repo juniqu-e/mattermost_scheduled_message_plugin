@@ -13,14 +13,22 @@ export interface ValidationResult {
 }
 
 /**
- * 예약 메시지 검증
+ * 예약 메시지 전체 검증
  * @param message - 메시지 내용
  * @param fileInfos - 첨부 파일 정보
+ * @param timestamp - 예약 시간 (Unix timestamp, milliseconds)
  * @returns 검증 결과
+ *
+ * 검증 우선순위:
+ * 1. 메시지/파일 필수 (최소 1개 필요)
+ * 2. 파일 개수 제한
+ * 3. 메시지 크기 제한
+ * 4. 시간 (미래 시간인지)
  */
-export function validateScheduleMessage(message: string, fileInfos: FileInfo[]): ValidationResult {
-    // 1. 메시지와 파일이 둘 다 비어있는지 확인
+export function validateSchedule(message: string, fileInfos: FileInfo[], timestamp: number): ValidationResult {
     const trimmedMessage = message.trim();
+
+    // 1. 메시지와 파일이 둘 다 비어있는지 확인
     if (!trimmedMessage && fileInfos.length === 0) {
         return {
             isValid: false,
@@ -47,6 +55,16 @@ export function validateScheduleMessage(message: string, fileInfos: FileInfo[]):
         };
     }
 
+    // 4. 시간 검증 (마지막)
+    const now = Date.now();
+    if (timestamp <= now) {
+        return {
+            isValid: false,
+            errorMessage: 'The scheduled time must be in the future. Please select a later time.',
+        };
+    }
+
+    // 모든 검증 통과
     return {
         isValid: true,
         errorMessage: null,

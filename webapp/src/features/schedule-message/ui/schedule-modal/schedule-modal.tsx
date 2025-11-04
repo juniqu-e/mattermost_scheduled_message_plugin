@@ -7,7 +7,7 @@ import DateTimePicker from './date-time-picker';
 
 import type {ScheduleModalProps} from '../../model/types';
 
-import {combineDateAndTime, getCurrentDate, getCurrentTime, validateScheduleMessage} from '@/shared/lib';
+import {combineDateAndTime, getDefaultScheduleDateTime, validateSchedule} from '@/shared/lib';
 import {SendIcon, FormatListBulletedIcon} from '@/shared/components';
 
 import './schedule-modal.css';
@@ -24,13 +24,26 @@ const {Modal} = window.ReactBootstrap;
 const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
     const {isOpen, message, fileInfos, onClose, onSchedule, onViewList} = props;
 
-    const [selectedDate, setSelectedDate] = React.useState(getCurrentDate());
-    const [selectedTime, setSelectedTime] = React.useState(getCurrentTime());
+    const defaultDateTime = getDefaultScheduleDateTime();
+    const [selectedDate, setSelectedDate] = React.useState(defaultDateTime.date);
+    const [selectedTime, setSelectedTime] = React.useState(defaultDateTime.time);
+
+    /**
+     * 모달이 열릴 때마다 기본 시간을 현재 + 5분으로 리셋
+     */
+    React.useEffect(() => {
+        if (isOpen) {
+            const newDefaultDateTime = getDefaultScheduleDateTime();
+            setSelectedDate(newDefaultDateTime.date);
+            setSelectedTime(newDefaultDateTime.time);
+        }
+    }, [isOpen]);
 
     /**
      * 검증 로직
      */
-    const validationResult = validateScheduleMessage(message, fileInfos);
+    const timestamp = combineDateAndTime(selectedDate, selectedTime);
+    const validationResult = validateSchedule(message, fileInfos, timestamp);
     const validationError = validationResult.errorMessage;
 
     /**

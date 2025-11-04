@@ -62,3 +62,22 @@ export function getCurrentTime(): string {
 export function getMinDate(): string {
     return getCurrentDate();
 }
+
+/**
+ * 기본 예약 날짜/시간 반환 (현재 시간 + 5분)
+ */
+export function getDefaultScheduleDateTime(): {date: string; time: string} {
+    const now = new Date();
+    const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
+
+    const year = fiveMinutesLater.getFullYear();
+    const month = String(fiveMinutesLater.getMonth() + 1).padStart(2, '0');
+    const day = String(fiveMinutesLater.getDate()).padStart(2, '0');
+    const date = `${year}-${month}-${day}`;
+
+    const hours = String(fiveMinutesLater.getHours()).padStart(2, '0');
+    const minutes = String(fiveMinutesLater.getMinutes()).padStart(2, '0');
+    const time = `${hours}:${minutes}`;
+
+    return {date, time};
+}
