@@ -162,8 +162,8 @@ func (s *ScheduleService) checkMaxMessageBytes(text string) error {
 func (s *ScheduleService) checkMaxFileIds(fileIds []string) error {
 	s.logger.Debug("Checking max FileIds", "fileIds", fileIds)
 	count := len(fileIds)
-	if count > 5 {
-		err := fmt.Errorf("the number of files cannot exceed 5. %v", count)
+	if count > 10 {
+		err := errors.New("uploads limited to 10 files maximum. please use additional posts for more files")
 		return err
 	}
 
