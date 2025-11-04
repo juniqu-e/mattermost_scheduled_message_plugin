@@ -7,7 +7,7 @@ import DateTimePicker from './date-time-picker';
 
 import type {ScheduleModalProps} from '../../model/types';
 
-import {combineDateAndTime, getCurrentDate, getCurrentTime} from '@/shared/lib/datetime';
+import {combineDateAndTime, getCurrentDate, getCurrentTime, validateScheduleMessage} from '@/shared/lib';
 import {SendIcon, FormatListBulletedIcon} from '@/shared/components';
 
 import './schedule-modal.css';
@@ -22,16 +22,22 @@ const {Modal} = window.ReactBootstrap;
  * @component
  */
 const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
-    const {isOpen, onClose, onSchedule, onViewList} = props;
+    const {isOpen, message, fileInfos, onClose, onSchedule, onViewList} = props;
 
     const [selectedDate, setSelectedDate] = React.useState(getCurrentDate());
     const [selectedTime, setSelectedTime] = React.useState(getCurrentTime());
 
     /**
+     * 검증 로직
+     */
+    const validationResult = validateScheduleMessage(message, fileInfos);
+    const validationError = validationResult.errorMessage;
+
+    /**
      * 예약 버튼 클릭 핸들러
      */
     const handleSchedule = () => {
-        if (!selectedDate || !selectedTime) {
+        if (!selectedDate || !selectedTime || validationError) {
             return;
         }
 
@@ -45,7 +51,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
         onClose();
     };
 
-    const isScheduleDisabled = !selectedDate || !selectedTime;
+    const isScheduleDisabled = !selectedDate || !selectedTime || !!validationError;
 
     return (
         <Modal
@@ -73,6 +79,13 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
                     onDateChange={setSelectedDate}
                     onTimeChange={setSelectedTime}
                 />
+
+                {/* 검증 에러 메시지 */}
+                {validationError && (
+                    <div className='schedule-modal-validation-error'>
+                        {validationError}
+                    </div>
+                )}
             </Modal.Body>
 
             <Modal.Footer className='schedule-modal-footer'>

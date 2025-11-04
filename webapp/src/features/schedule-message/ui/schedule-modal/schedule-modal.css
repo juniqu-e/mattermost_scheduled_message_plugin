@@ -123,6 +123,15 @@
     opacity: 1;
 }
 
+/* ---- Validation Error Message ---- */
+.schedule-modal-validation-error {
+    padding: 8px 0;
+    font-size: 12px;
+    line-height: 12px;
+    color: #d24b4e;
+    font-weight: 500;
+}
+
 /* ---- Modal Footer Buttons ---- */
 .schedule-modal .modal-footer {
     display: flex;
@@ -166,7 +175,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 10px !important;
+    font-size: 12px !important;
 }
 
 /* Cancel button - button style with red hover */
