@@ -7,6 +7,7 @@ import ScheduleIcon from './schedule-icon';
 
 import {useMessageData} from '../../hooks/use-message-data';
 import {useScheduleMessage} from '../../hooks/use-schedule-message';
+import {useFormattingBarWidth} from '../../hooks/use-formatting-bar-width';
 import type {SchedulePostButtonProps, FileInfo} from '../../model/types';
 import ScheduleModal from '../schedule-modal';
 import {scheduleApiClient} from '../../api/schedule-api';
@@ -33,8 +34,11 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
     const [fileInfos, setFileInfos] = React.useState<FileInfo[]>([]);
     const [hasUploads, setHasUploads] = React.useState(false);
 
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+
     const {getCurrentMessage, getCurrentFiles, clearDraft, hasUploadsInProgress} = useMessageData();
     const {scheduleMessage: scheduleMessageApi} = useScheduleMessage();
+    const {isWide, isVisible} = useFormattingBarWidth(buttonRef);
 
     /**
      * 버튼 클릭 이벤트 핸들러
@@ -135,6 +139,11 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
         </Tooltip>
     );
 
+    // 350px 이하에서는 버튼 전체를 숨김
+    if (!isVisible) {
+        return null;
+    }
+
     return (
         <>
             <div className='schedule-post-wrapper'>
@@ -162,19 +171,22 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
                         </span>
                     </button> */}
 
-                    {/* 바리에이션 2: 아이콘 + 텍스트 */}
+                    {/* 바리에이션 2: 아이콘 + 텍스트 (반응형) */}
                     <button
+                        ref={buttonRef}
                         type='button'
-                        className='schedule-post-button schedule-post-button--with-text'
+                        className={`schedule-post-button ${isWide ? 'schedule-post-button--with-text' : ''}`}
                         onClick={handleClick}
                         aria-label='Schedule message'
                     >
                         <span className='schedule-post-button__icon'>
                             <ScheduleIcon/>
                         </span>
-                        <span className='schedule-post-button__text'>
-                            {'예약'}
-                        </span>
+                        {isWide && (
+                            <span className='schedule-post-button__text'>
+                                {'예약'}
+                            </span>
+                        )}
                     </button>
 
                     {/* 바리에이션 3: 아이콘 + 텍스트 + 보더 */}
