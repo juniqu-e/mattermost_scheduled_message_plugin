@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {mattermostService} from '@/entities/mattermost/api/mattermost-service';
-import {DOM_SELECTORS, REDUX_ACTIONS} from '@/entities/mattermost/config/constants';
+import {DOM_SELECTORS, STORAGE_TYPES, getDraftKey} from '@/entities/mattermost/config/constants';
 import {selectCurrentDraft} from '@/entities/mattermost/model/selectors/draft-selectors';
 import type {FileInfo, PostDraft} from '@/entities/mattermost/model/types';
 
@@ -65,32 +65,31 @@ export class DraftService {
 
     /**
      * Draft 초기화 (메시지와 파일 모두 삭제)
+     * 원래 코드 방식: textbox 비우기 + 파일 제거 버튼 클릭
      */
     clearDraft(): void {
         try {
-            const currentChannelId = mattermostService.getCurrentChannelId();
-            if (!currentChannelId) {
-                console.log('No current channel ID for clearing draft');
-                return;
-            }
+            console.log('Clearing draft...');
 
-            // Redux store의 draft 업데이트
-            mattermostService.dispatch({
-                type: REDUX_ACTIONS.UPDATE_DRAFT,
-                channelId: currentChannelId,
-                draft: {
-                    message: '',
-                    fileInfos: [],
-                    uploadsInProgress: [],
-                },
-            });
-
-            // Textbox도 비우기
+            // 1. 메시지 입력창 비우기
             const textbox = document.querySelector(DOM_SELECTORS.POST_TEXTBOX) as HTMLTextAreaElement;
             if (textbox) {
                 textbox.value = '';
                 textbox.dispatchEvent(new Event('input', {bubbles: true}));
+                console.log('Textbox cleared');
             }
+
+            // 2. 첨부된 파일 삭제 (각 파일의 X 버튼을 프로그래밍적으로 클릭)
+            const removeButtons = document.querySelectorAll(DOM_SELECTORS.FILE_REMOVE_BUTTON);
+            console.log(`Found ${removeButtons.length} file remove buttons`);
+
+            removeButtons.forEach((button) => {
+                if (button instanceof HTMLElement) {
+                    button.click();
+                }
+            });
+
+            console.log('Draft cleared successfully');
         } catch (error) {
             console.error('Failed to clear draft:', error);
         }

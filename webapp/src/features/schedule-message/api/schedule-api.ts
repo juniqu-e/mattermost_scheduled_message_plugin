@@ -17,10 +17,18 @@ export class ScheduleApiClient {
     async createScheduledMessage(request: CreateScheduledMessageRequest): Promise<ScheduledMessage> {
         const url = `/plugins/${manifest.id}/api/v1/schedule`;
 
+        console.log('=== Schedule API Request ===');
+        console.log('URL:', url);
+        console.log('Request payload:', request);
+        console.log('Stringified:', JSON.stringify(request, null, 2));
+
         const response = await Client4.doFetch<ScheduledMessage>(url, {
             method: 'POST',
             body: JSON.stringify(request),
         });
+
+        console.log('=== Schedule API Response ===');
+        console.log('Response:', response);
 
         return response;
     }

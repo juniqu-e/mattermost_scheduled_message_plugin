@@ -18,19 +18,28 @@ export const DOM_SELECTORS = {
 
 /**
  * Redux Action Types
+ * Mattermost가 사용하는 실제 액션 타입
  */
-export const REDUX_ACTIONS = {
-    UPDATE_DRAFT: 'UPDATE_DRAFT',
+export const STORAGE_TYPES = {
+    SET_GLOBAL_ITEM: 'SET_GLOBAL_ITEM',
+    REMOVE_GLOBAL_ITEM: 'REMOVE_GLOBAL_ITEM',
 } as const;
 
 /**
  * Draft Key Format
+ * Mattermost가 사용하는 Storage Prefix
  */
-export const DRAFT_KEY_PREFIX = 'draft_';
+export const STORAGE_PREFIXES = {
+    DRAFT: 'draft_',
+    COMMENT_DRAFT: 'comment_draft_',
+} as const;
 
 /**
  * Draft key 생성
  */
-export function getDraftKey(channelId: string): string {
-    return `${DRAFT_KEY_PREFIX}${channelId}`;
+export function getDraftKey(channelId: string, rootId = ''): string {
+    if (rootId) {
+        return `${STORAGE_PREFIXES.COMMENT_DRAFT}${rootId}`;
+    }
+    return `${STORAGE_PREFIXES.DRAFT}${channelId}`;
 }
