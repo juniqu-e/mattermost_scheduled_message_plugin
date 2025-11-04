@@ -17,6 +17,7 @@ export interface ScheduleModalProps {
     fileInfos: FileInfo[];
     onClose: () => void;
     onSchedule: (timestamp: number) => void;
+    onViewList: () => void;
 }
 
 export interface DateTimePickerProps {

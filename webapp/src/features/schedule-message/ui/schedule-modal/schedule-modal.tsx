@@ -8,6 +8,7 @@ import DateTimePicker from './date-time-picker';
 import type {ScheduleModalProps} from '../../model/types';
 
 import {combineDateAndTime, getCurrentDate, getCurrentTime} from '@/shared/lib/datetime';
+import {SendIcon, FormatListBulletedIcon} from '@/shared/components';
 
 import './schedule-modal.css';
 
@@ -21,7 +22,7 @@ const {Modal} = window.ReactBootstrap;
  * @component
  */
 const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
-    const {isOpen, onClose, onSchedule} = props;
+    const {isOpen, onClose, onSchedule, onViewList} = props;
 
     const [selectedDate, setSelectedDate] = React.useState(getCurrentDate());
     const [selectedTime, setSelectedTime] = React.useState(getCurrentTime());
@@ -54,9 +55,14 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
             backdrop='static'
         >
             <Modal.Header closeButton={true}>
-                <Modal.Title>
-                    {'Schedule Message'}
-                </Modal.Title>
+                <div className='schedule-modal-header'>
+                    <Modal.Title>
+                        {'예약 메세지'}
+                    </Modal.Title>
+                    <p className='schedule-modal-header__description'>
+                        {'지정한 날짜와 시간에 메시지가 자동으로 전송됩니다.'}
+                    </p>
+                </div>
             </Modal.Header>
 
             <Modal.Body>
@@ -69,22 +75,40 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
                 />
             </Modal.Body>
 
-            <Modal.Footer>
-                <button
-                    type='button'
-                    className='btn btn-link'
-                    onClick={onClose}
-                >
-                    {'Cancel'}
-                </button>
-                <button
-                    type='button'
-                    className='btn btn-primary'
-                    onClick={handleSchedule}
-                    disabled={isScheduleDisabled}
-                >
-                    {'Schedule'}
-                </button>
+            <Modal.Footer className='schedule-modal-footer'>
+                <div className='schedule-modal-footer__left'>
+                    <button
+                        type='button'
+                        className='btn btn-link schedule-modal-footer__list'
+                        onClick={onViewList}
+                    >
+                        <FormatListBulletedIcon
+                            size={12}
+                            color='currentColor'
+                        />
+                        <span>{'예약 메세지 목록'}</span>
+                    </button>
+                </div>
+                <div className='schedule-modal-footer__right'>
+                    <button
+                        type='button'
+                        className='btn schedule-modal-footer__cancel'
+                        onClick={onClose}
+                    >
+                        {'Cancel'}
+                    </button>
+                    <button
+                        type='button'
+                        className='btn btn-primary'
+                        onClick={handleSchedule}
+                        disabled={isScheduleDisabled}
+                    >
+                        <SendIcon
+                            size={18}
+                            color='currentColor'
+                        />
+                    </button>
+                </div>
             </Modal.Footer>
         </Modal>
     );

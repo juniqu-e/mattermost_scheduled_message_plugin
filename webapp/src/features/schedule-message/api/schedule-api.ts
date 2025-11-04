@@ -24,6 +24,17 @@ export class ScheduleApiClient {
 
         return response;
     }
+
+    /**
+     * 채널의 예약 메시지 목록 조회
+     */
+    async getSchedules(channelId: string): Promise<void> {
+        const url = `/plugins/${manifest.id}/api/v1/schedule/${channelId}`;
+
+        await Client4.doFetch<void>(url, {
+            method: 'GET',
+        });
+    }
 }
 
 /**

@@ -16,6 +16,41 @@
     width: 100%;
 }
 
+/* 모달 애니메이션 속도 빠르게 */
+.schedule-modal.fade .modal-dialog {
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+.schedule-modal.fade.in .modal-dialog {
+    transform: translate(0, 0);
+}
+
+/* Modal Body 크기 증가 */
+.schedule-modal .modal-body {
+    padding: 0 32px 16px 32px !important;
+    min-height: 80px;
+}
+
+/* ---- Modal Header ---- */
+.schedule-modal-header {
+    width: 100%;
+}
+
+.schedule-modal-header .modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--center-channel-color);
+    margin-bottom: 6px;
+}
+
+.schedule-modal-header__description {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(var(--center-channel-color-rgb), 0.72);
+    margin: 0;
+    line-height: 18px;
+}
+
 /* ---- Date Time Picker ---- */
 .date-time-picker {
     display: flex;
@@ -97,6 +132,65 @@
 
 .schedule-modal .modal-footer .btn {
     min-width: 80px;
+}
+
+/* Footer Layout - 전체 너비 사용 */
+.schedule-modal .modal-footer.schedule-modal-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 15px 20px !important;
+    margin: 0 !important;
+    border-top: 1px solid rgba(var(--center-channel-color-rgb), 0.08);
+}
+
+.schedule-modal-footer__left {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.schedule-modal-footer__right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    margin-left: auto;
+}
+
+/* List button - with icon */
+.schedule-modal-footer__list {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px !important;
+}
+
+/* Cancel button - button style with red hover */
+.schedule-modal-footer__cancel {
+    min-width: 80px;
+    height: 40px;
+    padding: 8px 16px;
+    border: 1px solid #d24b4e !important;
+    border-radius: 4px;
+    background-color: transparent !important;
+    color: #d24b4e !important;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.schedule-modal-footer__cancel:hover {
+    background-color: #d24b4e !important;
+    border-color: #d24b4e !important;
+    color: #ffffff !important;
+}
+
+.schedule-modal-footer__cancel:active {
+    background-color: #a83c3e !important;
+    border-color: #a83c3e !important;
 }
 
 /* ---- Responsive ---- */

@@ -9,6 +9,8 @@ import {useMessageData} from '../../hooks/use-message-data';
 import {useScheduleMessage} from '../../hooks/use-schedule-message';
 import type {SchedulePostButtonProps, FileInfo} from '../../model/types';
 import ScheduleModal from '../schedule-modal';
+import {scheduleApiClient} from '../../api/schedule-api';
+import {mattermostService} from '@/entities/mattermost';
 
 import './schedule-post-button.css';
 
@@ -36,16 +38,36 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
     /**
      * 버튼 클릭 이벤트 핸들러
      */
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         // 현재 메시지와 파일 가져오기
         const currentMessage = getCurrentMessage();
         const currentFiles = getCurrentFiles();
 
-        // 메시지나 파일이 없으면 동작하지 않음
+        // 메시지나 파일이 없으면 예약 목록 조회
         if (!currentMessage && currentFiles.length === 0) {
-            console.log('No message or files to schedule');
+            console.log('No message or files, showing scheduled messages list');
+
+            try {
+                // 현재 채널 ID 가져오기
+                const channelId = mattermostService.getCurrentChannelId();
+                if (!channelId) {
+                    throw new Error('Could not determine current channel');
+                }
+
+                // API 호출 (서버가 ephemeral post로 리스트를 보여줌)
+                await scheduleApiClient.getSchedules(channelId);
+
+                console.log('Scheduled messages list requested successfully');
+            } catch (error) {
+                console.error('Failed to get scheduled messages:', error);
+                alert(`Failed to get scheduled messages: ${error instanceof Error ? error.message : String(error)}`);
+            }
+
+            if (props.onClick) {
+                props.onClick();
+            }
             return;
         }
 
@@ -98,6 +120,32 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
 
         // 모달 닫기
         handleCloseModal();
+    };
+
+    /**
+     * 리스트 보기 핸들러
+     */
+    const handleViewList = async () => {
+        console.log('Viewing scheduled messages list');
+
+        try {
+            // 현재 채널 ID 가져오기
+            const channelId = mattermostService.getCurrentChannelId();
+            if (!channelId) {
+                throw new Error('Could not determine current channel');
+            }
+
+            // API 호출 (서버가 ephemeral post로 리스트를 보여줌)
+            await scheduleApiClient.getSchedules(channelId);
+
+            console.log('Scheduled messages list requested successfully');
+        } catch (error) {
+            console.error('Failed to get scheduled messages:', error);
+            alert(`Failed to get scheduled messages: ${error instanceof Error ? error.message : String(error)}`);
+        }
+
+        // 모달 닫기 (draft는 유지됨)
+        setIsModalOpen(false);
     };
 
     const tooltip = (
@@ -172,6 +220,7 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
                 fileInfos={fileInfos}
                 onClose={handleCloseModal}
                 onSchedule={handleSchedule}
+                onViewList={handleViewList}
             />
         </>
     );
