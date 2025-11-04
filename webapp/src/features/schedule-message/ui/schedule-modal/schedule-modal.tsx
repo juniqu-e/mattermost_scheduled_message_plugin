@@ -22,7 +22,7 @@ const {Modal} = window.ReactBootstrap;
  * @component
  */
 const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
-    const {isOpen, message, fileInfos, onClose, onSchedule, onViewList} = props;
+    const {isOpen, message, fileInfos, hasUploadsInProgress, onClose, onSchedule, onViewList} = props;
 
     const defaultDateTime = getDefaultScheduleDateTime();
     const [selectedDate, setSelectedDate] = React.useState(defaultDateTime.date);
@@ -43,7 +43,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
      * 검증 로직
      */
     const timestamp = combineDateAndTime(selectedDate, selectedTime);
-    const validationResult = validateSchedule(message, fileInfos, timestamp);
+    const validationResult = validateSchedule(message, fileInfos, timestamp, hasUploadsInProgress);
     const validationError = validationResult.errorMessage;
 
     /**

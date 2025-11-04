@@ -64,6 +64,19 @@ export class DraftService {
     }
 
     /**
+     * 업로드 중인 파일이 있는지 확인
+     */
+    hasUploadsInProgress(): boolean {
+        const draft = this.getCurrentDraft();
+
+        if (draft?.uploadsInProgress && Array.isArray(draft.uploadsInProgress)) {
+            return draft.uploadsInProgress.length > 0;
+        }
+
+        return false;
+    }
+
+    /**
      * Draft 초기화 (메시지와 파일 모두 삭제)
      * 원래 코드 방식: textbox 비우기 + 파일 제거 버튼 클릭
      */

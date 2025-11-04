@@ -31,8 +31,9 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [message, setMessage] = React.useState('');
     const [fileInfos, setFileInfos] = React.useState<FileInfo[]>([]);
+    const [hasUploads, setHasUploads] = React.useState(false);
 
-    const {getCurrentMessage, getCurrentFiles, clearDraft} = useMessageData();
+    const {getCurrentMessage, getCurrentFiles, clearDraft, hasUploadsInProgress} = useMessageData();
     const {scheduleMessage: scheduleMessageApi} = useScheduleMessage();
 
     /**
@@ -75,9 +76,14 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
         console.log('Message:', currentMessage);
         console.log('Files:', currentFiles);
 
+        // 업로드 중인 파일 확인
+        const uploadsInProgress = hasUploadsInProgress();
+        console.log('Uploads in progress:', uploadsInProgress);
+
         // 상태 업데이트 및 모달 열기
         setMessage(currentMessage);
         setFileInfos(currentFiles);
+        setHasUploads(uploadsInProgress);
         setIsModalOpen(true);
 
         if (props.onClick) {
@@ -218,6 +224,7 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
                 isOpen={isModalOpen}
                 message={message}
                 fileInfos={fileInfos}
+                hasUploadsInProgress={hasUploads}
                 onClose={handleCloseModal}
                 onSchedule={handleSchedule}
                 onViewList={handleViewList}

@@ -32,9 +32,17 @@ export function useMessageData() {
         draftService.clearDraft();
     }, []);
 
+    /**
+     * 업로드 중인 파일이 있는지 확인
+     */
+    const hasUploadsInProgress = useCallback((): boolean => {
+        return draftService.hasUploadsInProgress();
+    }, []);
+
     return {
         getCurrentMessage,
         getCurrentFiles,
         clearDraft,
+        hasUploadsInProgress,
     };
 }

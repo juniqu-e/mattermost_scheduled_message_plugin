@@ -15,6 +15,7 @@ export interface ScheduleModalProps {
     isOpen: boolean;
     message: string;
     fileInfos: FileInfo[];
+    hasUploadsInProgress: boolean;
     onClose: () => void;
     onSchedule: (timestamp: number) => void;
     onViewList: () => void;
