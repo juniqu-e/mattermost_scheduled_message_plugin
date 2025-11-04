@@ -48,8 +48,6 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
 
         // 메시지나 파일이 없으면 예약 목록 조회
         if (!currentMessage && currentFiles.length === 0) {
-            console.log('No message or files, showing scheduled messages list');
-
             try {
                 // 현재 채널 ID 가져오기
                 const channelId = mattermostService.getCurrentChannelId();
@@ -59,11 +57,8 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
 
                 // API 호출 (서버가 ephemeral post로 리스트를 보여줌)
                 await scheduleApiClient.getSchedules(channelId);
-
-                console.log('Scheduled messages list requested successfully');
             } catch (error) {
-                console.error('Failed to get scheduled messages:', error);
-                alert(`Failed to get scheduled messages: ${error instanceof Error ? error.message : String(error)}`);
+                // 에러 발생 시 무시 (서버가 ephemeral post로 에러 표시)
             }
 
             if (props.onClick) {
@@ -72,13 +67,8 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
             return;
         }
 
-        // 메시지와 파일 정보 출력
-        console.log('Message:', currentMessage);
-        console.log('Files:', currentFiles);
-
         // 업로드 중인 파일 확인
         const uploadsInProgress = hasUploadsInProgress();
-        console.log('Uploads in progress:', uploadsInProgress);
 
         // 상태 업데이트 및 모달 열기
         setMessage(currentMessage);
@@ -104,24 +94,14 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
      * 예약 핸들러
      */
     const handleSchedule = async (timestamp: number) => {
-        console.log('Scheduling message:', {
-            timestamp,
-            message,
-            fileInfos,
-            scheduledDate: new Date(timestamp),
-        });
-
         try {
             // API 호출
             await scheduleMessageApi(timestamp, message, fileInfos);
 
-            console.log('Message scheduled successfully');
-
             // Draft 초기화 (메시지 및 파일 삭제)
             clearDraft();
         } catch (error) {
-            console.error('Failed to schedule message:', error);
-            alert(`Failed to schedule message: ${error instanceof Error ? error.message : String(error)}`);
+            // 에러 발생 시 무시 (서버가 ephemeral post로 에러 표시)
         }
 
         // 모달 닫기
@@ -132,8 +112,6 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
      * 리스트 보기 핸들러
      */
     const handleViewList = async () => {
-        console.log('Viewing scheduled messages list');
-
         try {
             // 현재 채널 ID 가져오기
             const channelId = mattermostService.getCurrentChannelId();
@@ -143,11 +121,8 @@ const SchedulePostButton: React.FC<SchedulePostButtonProps> = (props) => {
 
             // API 호출 (서버가 ephemeral post로 리스트를 보여줌)
             await scheduleApiClient.getSchedules(channelId);
-
-            console.log('Scheduled messages list requested successfully');
         } catch (error) {
-            console.error('Failed to get scheduled messages:', error);
-            alert(`Failed to get scheduled messages: ${error instanceof Error ? error.message : String(error)}`);
+            // 에러 발생 시 무시 (서버가 ephemeral post로 에러 표시)
         }
 
         // 모달 닫기 (draft는 유지됨)

@@ -19,7 +19,6 @@ export class DraftService {
             const state = mattermostService.getState();
             return selectCurrentDraft(state);
         } catch (error) {
-            console.error('Failed to get current draft:', error);
             return null;
         }
     }
@@ -82,29 +81,23 @@ export class DraftService {
      */
     clearDraft(): void {
         try {
-            console.log('Clearing draft...');
-
             // 1. 메시지 입력창 비우기
             const textbox = document.querySelector(DOM_SELECTORS.POST_TEXTBOX) as HTMLTextAreaElement;
             if (textbox) {
                 textbox.value = '';
                 textbox.dispatchEvent(new Event('input', {bubbles: true}));
-                console.log('Textbox cleared');
             }
 
             // 2. 첨부된 파일 삭제 (각 파일의 X 버튼을 프로그래밍적으로 클릭)
             const removeButtons = document.querySelectorAll(DOM_SELECTORS.FILE_REMOVE_BUTTON);
-            console.log(`Found ${removeButtons.length} file remove buttons`);
 
             removeButtons.forEach((button) => {
                 if (button instanceof HTMLElement) {
                     button.click();
                 }
             });
-
-            console.log('Draft cleared successfully');
         } catch (error) {
-            console.error('Failed to clear draft:', error);
+            // 에러 발생 시 무시
         }
     }
 }
