@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {mattermostService} from '@/entities/mattermost/api/mattermost-service';
-import {DOM_SELECTORS, STORAGE_TYPES, getDraftKey} from '@/entities/mattermost/config/constants';
+import {DOM_SELECTORS} from '@/entities/mattermost/config/constants';
 import {selectCurrentDraft} from '@/entities/mattermost/model/selectors/draft-selectors';
 import type {FileInfo, PostDraft} from '@/entities/mattermost/model/types';
 

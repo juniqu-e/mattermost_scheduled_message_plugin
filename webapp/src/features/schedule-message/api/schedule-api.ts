@@ -17,6 +17,7 @@ export class ScheduleApiClient {
     async createScheduledMessage(request: CreateScheduledMessageRequest): Promise<ScheduledMessage> {
         const url = `/plugins/${manifest.id}/api/v1/schedule`;
 
+        // @ts-expect-error - doFetch is protected but commonly used in plugins
         const response = await Client4.doFetch<ScheduledMessage>(url, {
             method: 'POST',
             body: JSON.stringify(request),
@@ -31,6 +32,7 @@ export class ScheduleApiClient {
     async getSchedules(channelId: string): Promise<void> {
         const url = `/plugins/${manifest.id}/api/v1/schedule/${channelId}`;
 
+        // @ts-expect-error - doFetch is protected but commonly used in plugins
         await Client4.doFetch<void>(url, {
             method: 'GET',
         });

@@ -2,8 +2,9 @@
 // See LICENSE.txt for license information.
 
 import {validateSchedule} from './validation';
-import {MAX_FILE_COUNT, MAX_MESSAGE_BYTES} from '@/shared/constants/validation';
+
 import type {FileInfo} from '@/entities/mattermost/model/types';
+import {MAX_FILE_COUNT, MAX_MESSAGE_BYTES} from '@/shared/constants/validation';
 
 describe('validateSchedule', () => {
     const futureTimestamp = Date.now() + 60000; // 1분 후
@@ -158,7 +159,7 @@ describe('validateSchedule', () => {
         });
 
         test('should pass when time is far in future', () => {
-            const timestamp = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 year
+            const timestamp = Date.now() + (365 * 24 * 60 * 60 * 1000); // 1 year
             const result = validateSchedule('test', [], timestamp);
 
             expect(result.isValid).toBe(true);

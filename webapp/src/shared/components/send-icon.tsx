@@ -16,16 +16,16 @@ interface IconProps {
 export const SendIcon: React.FC<IconProps> = ({size = '1em', color = 'currentColor', className, ...rest}) => {
     return (
         <svg
-            xmlns="http://www.w3.org/2000/svg"
-            version="1.1"
+            xmlns='http://www.w3.org/2000/svg'
+            version='1.1'
             width={size}
             height={size}
             fill={color}
-            viewBox="0 0 24 24"
+            viewBox='0 0 24 24'
             className={className}
             {...rest}
         >
-            <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+            <path d='M2,21L23,12L2,3V10L17,12L2,14V21Z'/>
         </svg>
     );
 };

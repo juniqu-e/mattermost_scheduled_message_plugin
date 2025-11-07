@@ -7,8 +7,8 @@ import DateTimePicker from './date-time-picker';
 
 import type {ScheduleModalProps} from '../../model/types';
 
-import {combineDateAndTime, getDefaultScheduleDateTime, validateSchedule} from '@/shared/lib';
 import {SendIcon, FormatListBulletedIcon} from '@/shared/components';
+import {combineDateAndTime, getDefaultScheduleDateTime, validateSchedule} from '@/shared/lib';
 
 import './schedule-modal.css';
 
@@ -64,7 +64,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
         onClose();
     };
 
-    const isScheduleDisabled = !selectedDate || !selectedTime || !!validationError;
+    const isScheduleDisabled = !selectedDate || !selectedTime || Boolean(validationError);
 
     return (
         <Modal
@@ -101,7 +101,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = (props) => {
                 )}
             </Modal.Body>
 
-            <Modal.Footer className='schedule-modal-footer'>
+            <Modal.Footer>
                 <div className='schedule-modal-footer__left'>
                     <button
                         type='button'

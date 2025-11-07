@@ -1,12 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {useCallback, useLayoutEffect, useState} from 'react';
+// @ts-expect-error - lodash types not available
 import debounce from 'lodash/debounce';
+import {useCallback, useLayoutEffect, useState} from 'react';
 
 export interface FormattingBarWidthState {
-    isWide: boolean;     // > 640px: 아이콘 + 텍스트
-    isVisible: boolean;  // > 350px: 버튼 표시
+    isWide: boolean; // > 640px: 아이콘 + 텍스트
+    isVisible: boolean; // > 350px: 버튼 표시
 }
 
 /**
@@ -28,6 +29,7 @@ export const useFormattingBarWidth = (containerRef?: React.RefObject<HTMLElement
     const handleResize = useCallback(debounce((width: number) => {
         // Mattermost의 기준: > 640px = 'wide'
         setIsWide(width > 640);
+
         // 350px 이하에서는 버튼 숨김
         setIsVisible(width > 350);
     }, 10), []);

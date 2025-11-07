@@ -144,7 +144,7 @@
 }
 
 /* Footer Layout - 전체 너비 사용 */
-.schedule-modal .modal-footer.schedule-modal-footer {
+.schedule-modal .modal-footer {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;

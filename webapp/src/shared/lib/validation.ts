@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {MAX_FILE_COUNT, MAX_MESSAGE_BYTES} from '@/shared/constants/validation';
 import type {FileInfo} from '@/entities/mattermost/model/types';
+import {MAX_FILE_COUNT, MAX_MESSAGE_BYTES} from '@/shared/constants/validation';
 
 /**
  * 예약 메시지 검증 결과

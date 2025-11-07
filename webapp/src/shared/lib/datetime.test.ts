@@ -86,9 +86,9 @@ describe('formatDateTime and combineDateAndTime round-trip', () => {
 
     test('should handle various dates and times', () => {
         const testCases = [
-            new Date(2025, 0, 1, 0, 0, 0),      // New Year midnight
-            new Date(2025, 11, 31, 23, 59, 0),  // New Year's Eve 23:59
-            new Date(2025, 6, 15, 12, 30, 0),   // Mid-year noon-ish
+            new Date(2025, 0, 1, 0, 0, 0), // New Year midnight
+            new Date(2025, 11, 31, 23, 59, 0), // New Year's Eve 23:59
+            new Date(2025, 6, 15, 12, 30, 0), // Mid-year noon-ish
         ];
 
         testCases.forEach((originalDate) => {

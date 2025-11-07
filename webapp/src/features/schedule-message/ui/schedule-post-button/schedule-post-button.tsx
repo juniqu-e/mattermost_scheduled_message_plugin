@@ -5,12 +5,13 @@ import React from 'react';
 
 import ScheduleIcon from './schedule-icon';
 
+import {scheduleApiClient} from '../../api/schedule-api';
+import {useFormattingBarWidth} from '../../hooks/use-formatting-bar-width';
 import {useMessageData} from '../../hooks/use-message-data';
 import {useScheduleMessage} from '../../hooks/use-schedule-message';
-import {useFormattingBarWidth} from '../../hooks/use-formatting-bar-width';
 import type {SchedulePostButtonProps, FileInfo} from '../../model/types';
 import ScheduleModal from '../schedule-modal';
-import {scheduleApiClient} from '../../api/schedule-api';
+
 import {mattermostService} from '@/entities/mattermost';
 
 import './schedule-post-button.css';

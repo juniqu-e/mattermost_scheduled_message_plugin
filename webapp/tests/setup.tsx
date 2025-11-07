@@ -9,7 +9,7 @@ import 'isomorphic-fetch';
 (global as any).window = {
     ...global.window,
     ReactBootstrap: {
-        Modal: ({children, show}: any) => show ? React.createElement('div', {'data-testid': 'modal'}, children) : null,
+        Modal: ({children, show}: any) => (show ? React.createElement('div', {'data-testid': 'modal'}, children) : null),
         OverlayTrigger: ({children}: any) => children,
         Tooltip: ({children, id}: any) => React.createElement('div', {'data-testid': id}, children),
     },

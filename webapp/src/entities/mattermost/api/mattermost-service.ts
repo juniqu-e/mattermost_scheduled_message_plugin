@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import type {Store, Action} from 'redux';
+
 import type {GlobalState} from '@mattermost/types/store';
 
 import {selectCurrentChannelId} from '../model/selectors/channel-selectors';
@@ -47,7 +48,7 @@ export class MattermostService {
             const state = this.getState();
             return selectCurrentChannelId(state);
         } catch (error) {
-            console.error('Failed to get current channel ID:', error);
+            // Failed to get current channel ID
             return null;
         }
     }
@@ -60,7 +61,7 @@ export class MattermostService {
             const store = this.getStore();
             store.dispatch(action);
         } catch (error) {
-            console.error('Failed to dispatch action:', error);
+            // Failed to dispatch action
         }
     }
 }

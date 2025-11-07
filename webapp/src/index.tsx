@@ -6,8 +6,8 @@ import type {Store, Action} from 'redux';
 
 import type {GlobalState} from '@mattermost/types/store';
 
-import {SchedulePostButton} from '@/features/schedule-message';
 import {mattermostService} from '@/entities/mattermost';
+import {SchedulePostButton} from '@/features/schedule-message';
 import type {PluginRegistry} from '@/shared/types/mattermost-webapp';
 
 export default class Plugin {

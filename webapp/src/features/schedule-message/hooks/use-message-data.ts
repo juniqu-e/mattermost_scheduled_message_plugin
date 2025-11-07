@@ -4,6 +4,7 @@
 import {useCallback} from 'react';
 
 import {draftService} from '../model/services/draft-service';
+
 import type {FileInfo} from '@/entities/mattermost/model/types';
 
 /**

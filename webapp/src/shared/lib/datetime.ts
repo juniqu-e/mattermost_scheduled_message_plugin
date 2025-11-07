@@ -58,7 +58,7 @@ export function getMinDate(): string {
  */
 export function getDefaultScheduleDateTime(): {date: string; time: string} {
     const now = new Date();
-    const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
+    const fiveMinutesLater = new Date(now.getTime() + (5 * 60 * 1000));
 
     const year = fiveMinutesLater.getFullYear();
     const month = String(fiveMinutesLater.getMonth() + 1).padStart(2, '0');

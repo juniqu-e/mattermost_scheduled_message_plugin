@@ -1,14 +1,17 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ScheduleApiClient} from './schedule-api';
 import {Client4} from 'mattermost-redux/client';
+
+import {ScheduleApiClient} from './schedule-api';
 
 // Mock mattermost-redux
 jest.mock('mattermost-redux/client');
 
 describe('ScheduleApiClient', () => {
     let apiClient: ScheduleApiClient;
+
+    // @ts-expect-error - doFetch is protected but we need to mock it for testing
     const mockDoFetch = Client4.doFetch as jest.MockedFunction<typeof Client4.doFetch>;
 
     beforeEach(() => {

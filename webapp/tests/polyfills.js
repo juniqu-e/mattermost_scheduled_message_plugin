@@ -17,11 +17,7 @@ if (typeof global.TextDecoder === 'undefined') {
 
 // Streams API
 if (typeof global.ReadableStream === 'undefined') {
-    global.ReadableStream = class ReadableStream {
-        constructor() {
-            // Mock implementation
-        }
-    };
+    global.ReadableStream = class ReadableStream {};
 }
 
 if (typeof global.WritableStream === 'undefined') {
