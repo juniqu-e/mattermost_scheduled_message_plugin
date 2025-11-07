@@ -13,3 +13,6 @@ env.sh
 
 # VS Code
 .vscode
+
+# Windows Zone.Identifier files
+*:Zone.Identifier
