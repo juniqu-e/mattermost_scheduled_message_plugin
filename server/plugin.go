@@ -10,6 +10,7 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mm"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/api"
@@ -87,18 +88,18 @@ func (prodBuilder) NewCommandHandler(
 func (prodBuilder) NewAPIHandler(
 	cli *pluginapi.Client,
 	poster ports.PostService,
-	Channel ports.ChannelService,
-	Command command.Interface,
-	ListStervice ports.ListService,
-	ScheduleService *command.ScheduleService,
+	channel ports.ChannelService,
+	command command.Interface,
+	listStervice ports.ListService,
+	scheduleService *command.ScheduleService,
 ) *api.Handler {
 	return api.NewHandler(
 		&cli.Log,
 		poster,
-		Channel,
-		Command,
-		ListStervice,
-		ScheduleService,
+		channel,
+		command,
+		listStervice,
+		scheduleService,
 	)
 }
 

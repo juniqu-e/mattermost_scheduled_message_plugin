@@ -10,8 +10,8 @@ import (
 )
 
 type CreateSceduleRequest struct {
-	ChannelId  string   `json:"channel_id"`
-	FileIds    []string `json:"file_ids"`
+	ChannelID  string   `json:"channel_id"`
+	FileIDs    []string `json:"file_ids"`
 	PostAtTime string   `json:"post_at_time"`
 	PostAtDate string   `json:"post_at_date"`
 	Message    string   `json:"message"`
@@ -28,12 +28,12 @@ func (h *Handler) CreateSchedule(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	h.logger.Debug("Successfully parsed CreateScedule request", "user_id", userID, "channel_id", req.ChannelId)
+	h.logger.Debug("Successfully parsed CreateScedule request", "user_id", userID, "channel_id", req.ChannelID)
 
 	h.logger.Debug("Calling ScheduleService BuildPost", "user_id", userID)
 
 	req.Message = parseRequestToCommand(req)
-	post, err := h.ScheduleService.BuildPost(userID, req.ChannelId, req.FileIds, req.Message)
+	post, err := h.ScheduleService.BuildPost(userID, req.ChannelID, req.FileIDs, req.Message)
 	if err != nil {
 		h.logger.Debug("Failed to BuildPost", "user_id", userID, "error", err)
 		h.poster.SendEphemeralPost(userID, post)

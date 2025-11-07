@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mattermost/mattermost/server/public/model"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )

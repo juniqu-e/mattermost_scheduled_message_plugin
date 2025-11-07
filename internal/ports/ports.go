@@ -3,6 +3,7 @@ package ports
 import (
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/clock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/types"
 )
@@ -88,10 +89,10 @@ type Scheduler interface {
 
 type ListService interface {
 	Build(userID string) *model.CommandResponse
-	BuildPost(userID string, channelId string) (*model.Post, error)
+	BuildPost(userID string, channelID string) (*model.Post, error)
 }
 
 type ScheduleService interface {
 	Build(args *model.CommandArgs, text string) *model.CommandResponse
-	BuildPost(userId string, channelId string, fileIds []string, text string) (*model.Post, error)
+	BuildPost(userID string, channelID string, fileIDs []string, text string) (*model.Post, error)
 }

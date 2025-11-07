@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/mattermost/mattermost/server/public/model"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/formatter"
@@ -45,7 +46,7 @@ func (l *ListService) Build(userID string) *model.CommandResponse {
 	return successResponse(attachments)
 }
 
-func (l *ListService) BuildPost(userID string, channelId string) (*model.Post, error) {
+func (l *ListService) BuildPost(userID string, channelID string) (*model.Post, error) {
 	l.logger.Info("Building scheduled message list for user", "user_id", userID)
 	msgs, err := l.loadMessages(userID)
 	if err != nil {
@@ -54,7 +55,7 @@ func (l *ListService) BuildPost(userID string, channelId string) (*model.Post, e
 
 		return &model.Post{
 			UserId:    userID,
-			ChannelId: channelId,
+			ChannelId: channelID,
 			Message:   errMsg,
 		}, err
 	}
@@ -62,7 +63,7 @@ func (l *ListService) BuildPost(userID string, channelId string) (*model.Post, e
 		l.logger.Info("User has no scheduled messages", "user_id", userID)
 		return &model.Post{
 			UserId:    userID,
-			ChannelId: channelId,
+			ChannelId: channelID,
 			Message:   constants.EmptyListMessage,
 		}, nil
 	}
@@ -70,7 +71,7 @@ func (l *ListService) BuildPost(userID string, channelId string) (*model.Post, e
 	l.logger.Debug("Successfully loaded messages, building attachments", "user_id", userID, "count", len(msgs))
 	attachments := l.buildAttachments(msgs)
 	l.logger.Debug("Successfully built attachments for message list", "user_id", userID, "count", len(attachments))
-	return buildSuccessPost(userID, channelId, attachments), nil
+	return buildSuccessPost(userID, channelID, attachments), nil
 }
 
 func (l *ListService) loadMessages(userID string) ([]*types.ScheduledMessage, error) {
@@ -101,8 +102,8 @@ func (l *ListService) loadMessages(userID string) ([]*types.ScheduledMessage, er
 		}
 		l.logger.Debug("Successfully loaded scheduled message", "user_id", userID, "message_id", msg.ID)
 
-		if len(msg.FileIds) > 0 {
-			msg.MessageContent = fmt.Sprintf("\\+ %v files\n%s", len(msg.FileIds), msg.MessageContent)
+		if len(msg.FileIDs) > 0 {
+			msg.MessageContent = fmt.Sprintf("\\+ %v files\n%s", len(msg.FileIDs), msg.MessageContent)
 		}
 
 		msgs = append(msgs, msg)
@@ -145,10 +146,10 @@ func (l *ListService) buildAttachments(msgs []*types.ScheduledMessage) []*model.
 	return attachments
 }
 
-func buildSuccessPost(userId string, channelId string, atts []*model.SlackAttachment) *model.Post {
+func buildSuccessPost(userID string, channelID string, atts []*model.SlackAttachment) *model.Post {
 	post := &model.Post{
-		UserId:    userId,
-		ChannelId: channelId,
+		UserId:    userID,
+		ChannelId: channelID,
 		Message:   constants.ListHeader,
 	}
 

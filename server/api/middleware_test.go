@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/testutil"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 )
-
 
 func TestMattermostAuthorizationRequired_Unauthorized(t *testing.T) {
 	p := &Handler{logger: &testutil.FakeLogger{}}
