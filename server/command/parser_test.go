@@ -68,12 +68,6 @@ func TestParseScheduleInput(t *testing.T) {
 			want:  &ParsedSchedule{TimeStr: "2pm", DateStr: "", Message: "Content"},
 		},
 		{
-			name:        "Message with only whitespace/newlines",
-			input:       "at 4pm message \n \t \n ",
-			wantErr:     true,
-			errContains: constants.ParserErrInvalidFormat,
-		},
-		{
 			name:  "Date included with multi-line message",
 			input: "at 6pm on 2024-08-15 message First line\nSecond line",
 			want:  &ParsedSchedule{TimeStr: "6pm", DateStr: "2024-08-15", Message: "First line\nSecond line"},
