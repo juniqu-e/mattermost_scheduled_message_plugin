@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/mattermost/mattermost/server/public/model"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/constants"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/formatter"
@@ -73,57 +74,57 @@ func (s *ScheduleService) Build(args *model.CommandArgs, text string) *model.Com
 	return s.successResponse(msg, localTime, tz, args.ChannelId)
 }
 
-func (s *ScheduleService) BuildPost(userId string, channelId string, fileIds []string, text string) (*model.Post, error) {
-	s.logger.Debug("Attempting to schedule message", "user_id", userId, "channel_id", channelId, "text", text)
+func (s *ScheduleService) BuildPost(userID string, channelID string, fileIDs []string, text string) (*model.Post, error) {
+	s.logger.Debug("Attempting to schedule message", "user_id", userID, "channel_id", channelID, "text", text)
 
-	s.logger.Debug("Validating schedule request", "user_id", userId)
-	if resp := s.validateAPIRequest(userId, text, fileIds); resp != nil {
-		s.logger.Error("Schedule request validation failed", "user_id", userId, "reason", resp.Text)
+	s.logger.Debug("Validating schedule request", "user_id", userID)
+	if resp := s.validateAPIRequest(userID, text, fileIDs); resp != nil {
+		s.logger.Error("Schedule request validation failed", "user_id", userID, "reason", resp.Text)
 
 		errMsg := resp.Text
 		return &model.Post{
-			UserId:    userId,
-			ChannelId: channelId,
+			UserId:    userID,
+			ChannelId: channelID,
 			Message:   errMsg,
 		}, errors.New(errMsg)
 	}
-	s.logger.Debug("Schedule request validated successfully", "user_id", userId)
+	s.logger.Debug("Schedule request validated successfully", "user_id", userID)
 
-	s.logger.Debug("Preparing schedule details", "user_id", userId, "channel_id", channelId)
+	s.logger.Debug("Preparing schedule details", "user_id", userID, "channel_id", channelID)
 
-	msg, loc, tz, err := s.prepareSchedule(userId, channelId, text)
+	msg, loc, tz, err := s.prepareSchedule(userID, channelID, text)
 	if err != nil {
 		errMsg := fmt.Sprintf("Error preparing schedule: %v, Original input: `%v`", err, text)
-		s.logger.Error("Failed to prepare schedule", "user_id", userId, "channel_id", channelId, "error", err, "original_text", text)
+		s.logger.Error("Failed to prepare schedule", "user_id", userID, "channel_id", channelID, "error", err, "original_text", text)
 
 		return &model.Post{
-			UserId:    userId,
-			ChannelId: channelId,
+			UserId:    userID,
+			ChannelId: channelID,
 			Message:   errMsg,
 		}, errors.New(errMsg)
 	}
 	localTime := msg.PostAt.In(loc)
-	msg.FileIds = fileIds
-	s.logger.Debug("Schedule details prepared", "user_id", userId, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
+	msg.FileIDs = fileIDs
+	s.logger.Debug("Schedule details prepared", "user_id", userID, "message_id", msg.ID, "post_at", localTime, "timezone", tz)
 
-	s.logger.Debug("Persisting scheduled message", "user_id", userId, "message_id", msg.ID)
-	if err := s.persist(userId, msg); err != nil {
-		channelLink := s.channel.MakeChannelLink(s.channel.GetInfoOrUnknown(channelId))
+	s.logger.Debug("Persisting scheduled message", "user_id", userID, "message_id", msg.ID)
+	if err := s.persist(userID, msg); err != nil {
+		channelLink := s.channel.MakeChannelLink(s.channel.GetInfoOrUnknown(channelID))
 		formatted := formatter.FormatScheduleError(localTime, tz, channelLink, err)
-		s.logger.Error("Failed to persist scheduled message", "user_id", userId, "message_id", msg.ID, "error", err)
+		s.logger.Error("Failed to persist scheduled message", "user_id", userID, "message_id", msg.ID, "error", err)
 
 		return &model.Post{
-			UserId:    userId,
-			ChannelId: channelId,
+			UserId:    userID,
+			ChannelId: channelID,
 			Message:   formatted,
 		}, err
 	}
-	s.logger.Info("Scheduled message persisted successfully", "user_id", userId, "message_id", msg.ID)
+	s.logger.Info("Scheduled message persisted successfully", "user_id", userID, "message_id", msg.ID)
 
 	return &model.Post{
-		UserId:    userId,
-		ChannelId: channelId,
-		Message:   s.successResponse(msg, localTime, tz, channelId).Text,
+		UserId:    userID,
+		ChannelId: channelID,
+		Message:   s.successResponse(msg, localTime, tz, channelID).Text,
 	}, nil
 }
 
@@ -159,9 +160,9 @@ func (s *ScheduleService) checkMaxMessageBytes(text string) error {
 	return nil
 }
 
-func (s *ScheduleService) checkMaxFileIds(fileIds []string) error {
-	s.logger.Debug("Checking max FileIds", "fileIds", fileIds)
-	count := len(fileIds)
+func (s *ScheduleService) checkMaxFileIDs(fileIDs []string) error {
+	s.logger.Debug("Checking max FileIds", "fileIds", fileIDs)
+	count := len(fileIDs)
 	if count > 10 {
 		err := errors.New("uploads limited to 10 files maximum. please use additional posts for more files")
 		return err
@@ -197,7 +198,7 @@ func (s *ScheduleService) getUserTimezone(userID string) string {
 	return tz
 }
 
-func (s *ScheduleService) validateAPIRequest(userID, text string, fileIds []string) *model.CommandResponse {
+func (s *ScheduleService) validateAPIRequest(userID, text string, fileIDs []string) *model.CommandResponse {
 	s.logger.Debug("Starting request validation", "user_id", userID)
 	if maxUserMessagesErr := s.checkMaxUserMessages(userID); maxUserMessagesErr != nil {
 		return s.errorResponse(formatter.FormatScheduleValidationError(maxUserMessagesErr))
@@ -205,12 +206,12 @@ func (s *ScheduleService) validateAPIRequest(userID, text string, fileIds []stri
 	if maxMessageBytesErr := s.checkMaxMessageBytes(text); maxMessageBytesErr != nil {
 		return s.errorResponse(formatter.FormatScheduleValidationError(maxMessageBytesErr))
 	}
-	if maxFileIdsErr := s.checkMaxFileIds(fileIds); maxFileIdsErr != nil {
-		return s.errorResponse(formatter.FormatScheduleValidationError(maxFileIdsErr))
+	if maxFileIDsErr := s.checkMaxFileIDs(fileIDs); maxFileIDsErr != nil {
+		return s.errorResponse(formatter.FormatScheduleValidationError(maxFileIDsErr))
 	}
 
 	trimmedText := strings.TrimSpace(text)
-	if trimmedText == "" && len(fileIds) == 0 {
+	if trimmedText == "" && len(fileIDs) == 0 {
 		s.logger.Debug("Validation failed: empty command text", "user_id", userID)
 		return s.errorResponse(formatter.FormatEmptyCommandError())
 	}

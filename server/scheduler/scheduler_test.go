@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/mattermost/mattermost/server/public/model"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mm"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/adapters/mock"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"

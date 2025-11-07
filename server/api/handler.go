@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost/server/public/plugin"
+
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/internal/ports"
 	"lab.ssafy.com/adjl1346/mattermost-plugin-schedule-message-gui/server/command"
 )
@@ -21,19 +22,19 @@ type Handler struct {
 func NewHandler(
 	logger ports.Logger,
 	poster ports.PostService,
-	Channel ports.ChannelService,
-	Command command.Interface,
-	ListService ports.ListService,
-	ScheduleService ports.ScheduleService,
+	channel ports.ChannelService,
+	command command.Interface,
+	listService ports.ListService,
+	scheduleService ports.ScheduleService,
 ) *Handler {
 	logger.Debug("Creating new api Handler")
 	return &Handler{
 		logger:          logger,
 		poster:          poster,
-		Channel:         Channel,
-		Command:         Command,
-		ListService:     ListService,
-		ScheduleService: ScheduleService,
+		Channel:         channel,
+		Command:         command,
+		ListService:     listService,
+		ScheduleService: scheduleService,
 	}
 }
 

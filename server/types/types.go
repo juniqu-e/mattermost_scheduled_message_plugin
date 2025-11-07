@@ -9,5 +9,5 @@ type ScheduledMessage struct {
 	PostAt         time.Time `json:"post_at"`
 	MessageContent string    `json:"message_content"`
 	Timezone       string    `json:"timezone"`
-	FileIds        []string  `json:"file_ids"`
+	FileIDs        []string  `json:"file_ids"`
 }
